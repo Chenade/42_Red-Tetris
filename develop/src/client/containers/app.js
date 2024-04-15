@@ -1,28 +1,18 @@
-import { connect } from "react-redux";
-import { EmptyCell } from "../types";
-import Board from "../components/Board";
-import React from "react";
+import React from 'react'
+import { connect } from 'react-redux'
 
-const board = Array.from(
-  {
-    length: 20,
-  },
-  () => Array.from({ length: 10 }, () => EmptyCell.Empty)
-);
 
-const App = () => {
+const App = ({message}) => {
   return (
-    <div className="App">
-      <h1>Tetris</h1>
-      <Board currentBoard={board} />
-    </div>
-  );
-};
+    <span>{message}</span>
+  )
+}
 
 const mapStateToProps = (state) => {
   return {
-    message: state.message,
-  };
-};
+    message: state.message
+  }
+}
+export default connect(mapStateToProps, null)(App)
 
-export default connect(mapStateToProps, null)(App);
+
