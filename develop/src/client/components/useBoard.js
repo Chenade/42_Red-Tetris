@@ -16,54 +16,96 @@ export function useBoard() {
   );
 
   function updateStage(stage, x, y) {
-    // copy the stage first
     const res = stage.slice();
     res[y] = stage[y].slice();
-    // put the block's cell to stage
     res[y][x] = 1;
     return res;
   }
 
   function mergeIntoStage(stage, shape, position) {
-    // calculate the block position in the stage
-    shape.forEach((row, y) => {
-      row.forEach((cell, x) => {
-        if (cell === 1) {
+    if (!Array.isArray(shape) || shape.length === 0) {
+      return stage;
+    }
+    let newStage = JSON.parse(JSON.stringify(stage));
+
+    for (let y = 0; y < shape.length; y++) {
+      for (let x = 0; x < shape[y].length; x++) {
+        if (shape[y][x] === 1) {
           const stageX = x + position.x;
           const stageY = y + position.y;
 
-          // if block cell is inside the stage, update stage
           if (
             stageX >= 0 &&
             stageY >= 0 &&
             stageX < COLUMN_COUNT &&
             stageY < ROW_COUNT
           ) {
-            stage = updateStage(stage, stageX, stageY);
+            newStage = updateStage(newStage, stageX, stageY);
           }
         }
-      });
-    });
+      }
+    }
 
-    return stage;
+    return newStage;
   }
 
   function updateDisplay() {
-    console.log("scene", scene);
-    console.log("shape", shape);
-    console.log("position", position);
     setDisplay(mergeIntoStage(scene, shape, position));
   }
 
   useEffect(updateDisplay, [scene, shape, position]);
 
-  // drop block
+  function validMove(position, shape) {
+    if (!Array.isArray(shape) || shape.length === 0) {
+      return false;
+    }
+    for (let y = 0; y < shape.length; y++) {
+      for (let x = 0; x < shape[y].length; x++) {
+        if (shape[y][x] === 1) {
+          const stageX = x + position.x;
+          const stageY = y + position.y;
+
+          if (
+            stageX < 0 ||
+            stageX >= COLUMN_COUNT ||
+            stageY >= ROW_COUNT ||
+            scene[stageY][stageX] !== 0
+          ) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  function moveBlock(x, y) {
+    const res = { x: x + position.x, y: y + position.y };
+
+    if (!validMove(res, shape)) {
+      return false;
+    }
+
+    setPosition(res);
+
+    return true;
+  }
+
+  function touchGround() {
+    setScene(mergeIntoStage(scene, shape, position));
+    setShape(shapes.I);
+    setPosition({ x: 0, y: 0 });
+  }
+
+  function tick() {
+    if (!moveBlock(0, 1)) {
+      touchGround();
+    }
+  }
+
   useInterval(() => {
-    setPosition((prevPosition) => ({
-      x: prevPosition.x,
-      y: prevPosition.y + 1,
-    }));
-  }, 1000);
+    tick();
+  }, 500);
 
   return { display };
 }
