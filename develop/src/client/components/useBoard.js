@@ -19,6 +19,8 @@ export function useBoard() {
   const [display, setDisplay] = useState(
     Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0))
   );
+  // game over
+  const [gameover, setGameover] = useState(false);
 
   function updateStage(stage, x, y) {
     const res = stage.slice();
@@ -116,9 +118,22 @@ export function useBoard() {
     return true;
   }
 
+  function endGame() {
+    // if the block is at the top of the stage
+    if (position.y === 0) {
+      console.log("Game Over");
+      return true;
+    }
+    return false;
+  }
+
   function touchGround() {
     // keep the block in the scene
     setScene(mergeIntoStage(scene, shape, position));
+    if (endGame()) {
+      setGameover(true);
+      return;
+    }
     // drop new block
     setShape(shapes.J);
     setPosition({ x: 0, y: 0 });
@@ -132,8 +147,10 @@ export function useBoard() {
   }
 
   useInterval(() => {
-    // every 500ms, drop the block
-    tick();
+    if (!gameover) {
+      // every TICK_INTERVAL ms, drop the block
+      tick();
+    }
   }, TICK_INTERVAL);
 
   // rotate block
@@ -148,7 +165,6 @@ export function useBoard() {
   }
 
   function onKeyDown(event) {
-    console.log("onKeyDown", event.key);
     switch (event.key) {
       case "ArrowRight":
         moveBlock(1, 0);
