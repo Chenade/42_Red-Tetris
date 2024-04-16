@@ -60,6 +60,25 @@ export function useBoard() {
 
   useEffect(updateDisplay, [scene, shape, position]);
 
+  function removeRows() {
+    // Remove any completed rows
+    let newScene = scene.filter((row) => row.some((cell) => cell === 0));
+
+    // Add new rows at the top
+    const rowsRemoved = ROW_COUNT - newScene.length;
+    for (let i = 0; i < rowsRemoved; i++) {
+      newScene.unshift(Array(COLUMN_COUNT).fill(0));
+    }
+
+    // update scene
+    if (rowsRemoved > 0) {
+      setScene(newScene);
+    }
+  }
+
+  // check if any row is completed
+  useEffect(removeRows, [scene]);
+
   function validMove(position, shape) {
     if (!Array.isArray(shape) || shape.length === 0) {
       return false;
@@ -119,9 +138,7 @@ export function useBoard() {
 
   // rotate block
   function rotateShape() {
-    const rotatedShape = shape[0].map((col, i) =>
-      shape.map((row) => row[i])
-    );
+    const rotatedShape = shape[0].map((col, i) => shape.map((row) => row[i]));
     rotatedShape.forEach((row) => row.reverse());
 
     // if new shape is valid, update the shape
