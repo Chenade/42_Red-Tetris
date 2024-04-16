@@ -1,8 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { useBoard } from "./useBoard";
 
-const Board = () => {
-  const { display } = useBoard();
+const Board = React.memo(() => {
+  const [display, onKeyDown] = useBoard();
+  useEffect(() => {
+    // add event listener for keyInput
+    const handleKeyDown = (event) => {
+      onKeyDown(event);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onKeyDown]);
+
   return (
     <div>
       {display &&
@@ -32,6 +45,6 @@ const Board = () => {
         })}
     </div>
   );
-};
+});
 
 export default Board;
