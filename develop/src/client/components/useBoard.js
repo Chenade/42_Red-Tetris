@@ -12,7 +12,7 @@ export function useBoard() {
     Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0))
   );
   // shape: current block
-  const [shape, setShape] = useState(shapes.O);
+  const [shape, setShape] = useState(shapes.S);
   // position: current block position
   const [position, setPosition] = useState({ x: 0, y: 0 });
   // display: scene + shape
@@ -101,7 +101,7 @@ export function useBoard() {
     // keep the block in the scene
     setScene(mergeIntoStage(scene, shape, position));
     // drop new block
-    setShape(shapes.I);
+    setShape(shapes.J);
     setPosition({ x: 0, y: 0 });
   }
 
@@ -117,6 +117,19 @@ export function useBoard() {
     tick();
   }, TICK_INTERVAL);
 
+  // rotate block
+  function rotateShape() {
+    const rotatedShape = shape[0].map((col, i) =>
+      shape.map((row) => row[i])
+    );
+    rotatedShape.forEach((row) => row.reverse());
+
+    // if new shape is valid, update the shape
+    if (validMove(position, rotatedShape)) {
+      setShape(rotatedShape);
+    }
+  }
+
   function onKeyDown(event) {
     console.log("onKeyDown", event.key);
     switch (event.key) {
@@ -128,14 +141,14 @@ export function useBoard() {
         moveBlock(-1, 0);
         event.preventDefault();
         break;
-      //case "ArrowDown":
-      //  moveBlock(0, 1);
-      //  event.preventDefault();
-      //  break;
-      //case "ArrowUp":
-      //  rotateShape();
-      //  event.preventDefault();
-      //  break;
+      case "ArrowDown":
+        moveBlock(0, 1);
+        event.preventDefault();
+        break;
+      case "ArrowUp":
+        rotateShape();
+        event.preventDefault();
+        break;
       default:
         break;
     }
