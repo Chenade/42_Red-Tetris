@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Client</title>
+</head>
+<body>
+    <h1>Game Client</h1>
+
+    <!-- Include Socket.io -->
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script>
+
+        const socket = io();
+
+        socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Disconnected from server');
+        });
+
+        // Function to join a room
+        function joinRoom(roomId) {
+            socket.emit('joinRoom', roomId);
+        }
+
+        // Handle join room success
+        socket.on('joinRoomSuccess', (data) => {
+            data = JSON.parse(JSON.stringify(data));
+            console.log(data);
+        });
+
+        // Handle join room failure
+        socket.on('joinRoomFailed', (reason) => {
+            console.log(`Failed to join room: ${reason}`);
+        });
+
+        // setTimeout(() => {
+            joinRoom('room1');
+        // }, 3000);
+
+
+    </script>
+</body>
+</html>
