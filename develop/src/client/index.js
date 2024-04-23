@@ -1,13 +1,14 @@
 import React from 'react'
 import ReactDom from 'react-dom'
-import {createLogger} from 'redux-logger'
+import { createLogger } from 'redux-logger'
 import thunk from 'redux-thunk'
 import { createStore, applyMiddleware } from 'redux'
-import { Provider } from 'react-redux'                                                                                                                                                    
-import {storeStateMiddleWare} from './middleware/storeStateMiddleWare'
+import { Provider } from 'react-redux'
+import { storeStateMiddleWare } from './middleware/storeStateMiddleWare'
 import reducer from './reducers'
 import App from './containers/app'
-import {alert} from './actions/alert'
+import { alert } from './actions/alert'
+import io from 'socket.io-client'; // Import socket.io-client library
 
 const initialState = {}
 
@@ -17,9 +18,23 @@ const store = createStore(
   applyMiddleware(thunk, createLogger())
 )
 
+const socket = io('http://localhost:3000'); // Replace with your server URL
+
+socket.on('connect', () => {
+  console.log('Connected to server');
+});
+
+socket.on('disconnect', () => {
+  console.log('Disconnected from server');
+});
+
+// Pass the `socket` instance to your Redux actions or components as needed
+// For example, you can dispatch an action to store the socket instance in the Redux store
+store.dispatch({ type: 'SET_SOCKET', payload: socket });
+
 ReactDom.render((
   <Provider store={store}>
-    <App/>
+    <App />
   </Provider>
 ), document.getElementById('tetris'))
 
