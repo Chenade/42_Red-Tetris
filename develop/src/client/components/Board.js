@@ -34,6 +34,7 @@ const Board = React.memo(() => {
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
+                      backgroundColor: cell === 0 ? "white" : cell === 1 ? "red" : "transparent"
                     }}
                   >
                     {cell}
