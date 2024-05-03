@@ -63,10 +63,10 @@ const initEngine = io => {
         }
     });
     socket.on('joinRoom', function (roomId) {
-        var room = io.sockets.adapter.rooms.get(roomId);
+        var room = io.sockets.adapter.rooms[roomId];
         if (!room || (room.size < 2)) {
             socket.join(roomId);
-            var _room = io.sockets.adapter.rooms.get(roomId);
+            var _room = io.sockets.adapter.rooms[roomId];
             var player = 'player' + ((_room === null || _room === void 0 ? void 0 : _room.size) || 0);
             socketToPlayer.set(socket.id, { roomId: roomId, player: player });
             socket.emit('joinRoomSuccess', { 'player': player, 'roomId': roomId });
