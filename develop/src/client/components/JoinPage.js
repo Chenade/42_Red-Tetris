@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
-import socket from '../index'; // Ensure this is correctly imported
+import socket from '../index';
 
 const JoinPage = ({ onJoinSuccess }) => {
     const [room, setRoom] = useState('');
-    const [playerName, setPlayerName] = useState('');
     const [error, setError] = useState('');
 
     const handleJoin = () => {
-        socket.emit('joinRoom', room, (response) => {
-            if (response.success) {
-                onJoinSuccess(room, playerName);
-            } else {
-                setError(response.message);
-            }
+        socket.emit('joinRoom', room);
+    
+        socket.on('joinRoomSuccess', (response) => {
+            console.log(response);
+            onJoinSuccess(room, response.player);
+        });
+    
+        socket.on('joinRoomFailed', (response) => {
+            console.log(response);
+            setError(response);
         });
     };
 
@@ -24,12 +27,6 @@ const JoinPage = ({ onJoinSuccess }) => {
                 placeholder="Room"
                 value={room}
                 onChange={(e) => setRoom(e.target.value)}
-            />
-            <input
-                type="text"
-                placeholder="Player Name"
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
             />
             <button onClick={handleJoin}>Join</button>
             {error && <p>{error}</p>}

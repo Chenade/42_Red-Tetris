@@ -62,3 +62,9 @@
 }
 ```
 
+## Start client & server
+```
+npm run-script client-dev
+npm run-script srv-dev
+```
+
