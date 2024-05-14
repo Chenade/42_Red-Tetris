@@ -1,8 +1,10 @@
 import React, { useEffect } from "react";
 import { useBoard } from "./useBoard";
 
-const Board = React.memo(() => {
-  const [display, onKeyDown] = useBoard();
+const Board = React.memo(({ initialShape }) => {
+  
+  const [display, onKeyDown] = useBoard(initialShape);
+
   useEffect(() => {
     // add event listener for keyInput
     const handleKeyDown = (event) => {
