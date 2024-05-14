@@ -1,31 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import Board from './Board';
 import socket from '../index';
+import { shapes, shapeIndex } from "../configs/shapes";
 
 const Game = ({ room, playerName }) => {
-    // State to control the visibility of the Board
-    const [showBoard, setShowBoard] = useState(false);
 
-    // Function to handle the Start button click
+    const [ showBoard,    setShowBoard    ] = useState(false);
+    const [ initialShape, setInitialShape ] = useState([]);
+
+    // start the game
     const handleStart = () => {
-        setShowBoard(true);
         socket.emit('start', (response) => {
             console.log('emit start and received response', response);
-            setError(response);
         });
     };
 
     useEffect(() => {
+
+        // receive start event and show the board
         const handleStartEvent = (data) => {
             console.log('received start event', data);
-            // Additional logic to handle start event
+            //setShowBoard(true);
         };
     
+        // receive initial block shape
         const handleMessageEvent = (message) => {
             console.log('received message', message);
-            // Additional logic to handle message event
+            if (message.event === 'newPuzzle') {
+                const init = message.data.type;
+                if (0 <= init && init < 7) {
+                    console.log('set this shape as initialShape: ', shapeIndex[init]);
+                    setInitialShape(shapes[shapeIndex[init]]);
+                } else {
+                    console.log('Received shape index is invalid:', init);
+                }
+            }
         };
     
+        // add listeners for start and message events
         socket.on('start', handleStartEvent);
         socket.on('message', handleMessageEvent);
     
@@ -36,20 +48,29 @@ const Game = ({ room, playerName }) => {
         };
     }, []);
 
+    // when initialShape is set, show the board
+    useEffect(() => {
+        if (initialShape && initialShape.length)
+            setShowBoard(true);
+    }, [initialShape]);
+
     return (
         <div>
             <h1>Red Tetris</h1>
             <p>Room: {room}</p>
             <p>Player: {playerName}</p>
-            {!showBoard ? (
-                <button onClick={handleStart} style={{ margin: '10px' }}>
-                    Start Game
-                </button>
-            ) : (
-                <div>
-                    <Board />
-                </div>
-            )}
+            {
+                showBoard ? 
+                (
+                    <div>
+                        <Board initialShape={initialShape} />
+                    </div>
+                ) : (
+                    <button onClick={handleStart} style={{ margin: '10px' }}>
+                        Start Game
+                    </button>
+                )
+            }
         </div>
     );
 };
