@@ -35,3 +35,13 @@ export const shapes = {
     [0, 0, 0],
   ],
 };
+
+export const shapeIndex = {
+  0: 'I',
+  1: 'J',
+  2: 'L',
+  3: 'O',
+  4: 'S',
+  5: 'T',
+  6: 'Z',
+};

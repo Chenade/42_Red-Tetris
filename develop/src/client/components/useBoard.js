@@ -6,13 +6,13 @@ const ROW_COUNT = 20;
 const COLUMN_COUNT = 10;
 const TICK_INTERVAL = 500;
 
-export function useBoard() {
+export function useBoard(initialShape) {
   // scene: background
   const [scene, setScene] = useState(
     Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0))
   );
   // shape: current block
-  const [shape, setShape] = useState(shapes.S);
+  const [shape, setShape] = useState(initialShape);
   // position: current block position
   const [position, setPosition] = useState({ x: 0, y: 0 });
   // display: scene + shape
