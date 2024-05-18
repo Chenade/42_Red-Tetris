@@ -49,76 +49,129 @@ const initApp = (app, params, cb) => {
 
 var status = {};
 var socketToPlayer = new Map();
+var roomPlayers = new Map();
+
+function joinRoom(roomId, socket, io)
+{
+	socket.join(roomId);
+	var _room = io.sockets.adapter.rooms[roomId];
+    var player = 'player' + ((_room === null || _room === void 0 ? void 0 : _room.length) || 0);
+	socketToPlayer.set(socket.id, { roomId: roomId, player: player });
+	socket.emit('joinRoomSuccess', { 'player': player, 'roomId': roomId });
+}
+
 
 const initEngine = io => {
-  io.on('connection', function (socket) {
-    console.log('A user connected');
+	
+	io.on('connection', function (socket) {
+	// console.log('A user connected');
+
     socket.on('disconnect', function () {
-        console.log('User disconnected');
+        // console.log('User disconnected');
         if (socketToPlayer.has(socket.id)) {
             var playerRole = socketToPlayer.get(socket.id);
             socket.leave(playerRole.roomId);
-            console.log("Player disconnected: ".concat(playerRole.player));
+            // console.log("Player disconnected: ".concat(playerRole.player));
             socketToPlayer.delete(socket.id);
         }
     });
+
     socket.on('joinRoom', function (roomId) {
         var room = io.sockets.adapter.rooms[roomId];
-        if (!room || (room.size < 2)) {
-            socket.join(roomId);
-            var _room = io.sockets.adapter.rooms[roomId];
-            var player = 'player' + ((_room === null || _room === void 0 ? void 0 : _room.size) || 0);
-            socketToPlayer.set(socket.id, { roomId: roomId, player: player });
-            socket.emit('joinRoomSuccess', { 'player': player, 'roomId': roomId });
-            console.log("User joined room ".concat(roomId, " as ").concat(player));
-        }
-        else {
-            socket.emit('joinRoomFailed', 'Room is full');
-            console.log("User tried to join room ".concat(roomId, ", but it's full"));
-        }
+
+		if (room)
+		{
+			if (status[roomId])
+				socket.emit('joinRoomFailed', 'Room already start');
+			else if (room.length > 1)
+				socket.emit('joinRoomFailed', 'Room is full');
+			else
+				joinRoom(roomId, socket, io);
+		}
+		else
+			joinRoom(roomId, socket, io);
     });
-    socket.on('leaveRoom', function (roomId) {
+	
+    socket.on('leaveRoom', function () {
+		var socketInfo = socketToPlayer.get(socket.id);
+		const roomId = socketInfo.roomId;
         socket.leave(roomId);
-        console.log("User left room ".concat(roomId));
+		socketToPlayer.delete(socket.id);
+      	socket.to(socket.id).emit('leaveRoomSuccess', {});
+		socket.to(roomId).emit('op_left', {})
     });
-    socket.on('message', function (roomId, eventData) {
+
+	socket.on('end', function (winner) {
+		var socketInfo = socketToPlayer.get(socket.id);
+		const roomId = socketInfo.roomId;
+        socket.to(roomId).emit('gameOver', {winner: winner});
+		socketToPlayer.delete(socket.id);
+		delete status[roomId];
+    });
+
+    socket.on('message', function (eventData) {
+		eventData = JSON.parse(eventData);
+		var socketInfo = socketToPlayer.get(socket.id);
+		const roomId = socketInfo.roomId;
+
         socket.to(roomId).emit('message', eventData);
         console.log("Message event sent to room ".concat(roomId), eventData);
-        var event = eventData.event, data = eventData.data;
+        var event = eventData.event, 
+			data = eventData.info;
         if (event === 'next') {
-            var player = data.player;
+            // var player = data.player;
+            var player = socketToPlayer.get(socket.id);
             if (player === 'player1') {
                 status[roomId].player1.puzzle += 1;
-                io.to(roomId).emit('message', { event: 'newPuzzle', data: { type: (0, randomInt)(1, 100) } });
+                io.to(socket.id).emit('message', { event: 'newPuzzle', data: { type: status[roomId].player1.puzzle } });
+                io.to(roomId).emit('message', { event: 'op_puzzle', data: {player: 'player1' , type: status[roomId].player1.puzzle } });
             }
             else if (player === 'player2') {
-                status[roomId].player2.puzzle += 1;
-                io.to(roomId).emit('message', { event: 'newPuzzle', data: { type: (0, randomInt)(1, 100) } });
+				status[roomId].player2.puzzle += 1;
+                io.to(socket.id).emit('message', { event: 'newPuzzle', data: { type: status[roomId].player2.puzzle } });
+				io.to(roomId).emit('message', { event: 'op_puzzle', data: {player: 'player2' , type: status[roomId].player2.puzzle } });
             }
         }
+		else
+		{
+			io.to(roomId).emit('message', { event: 'op_'.concat(event)
+			, data: {
+				player: player === 'player1' ? 'player1' : 'player2',
+				data: data } 
+			});
+		}
     });
     socket.on('start', function () {
         if (socketToPlayer.has(socket.id)) {
-            var playerRole = socketToPlayer.get(socket.id);
-            var roomId = playerRole.roomId, player = playerRole.player;
+            var socketInfo = socketToPlayer.get(socket.id);
+            var roomId = socketInfo.roomId, player = socketInfo.player;
+
+			console.log("Start event sent to room ".concat(roomId, " by ").concat(player));
+			
             // Check if the player is player 1
-            if (player === 'player1') {
-                console.log("Start event sent to room ".concat(roomId, " by ").concat(player));
+			if (player === 'player1') {
                 io.to(roomId).emit('start', player);
                 if (!status[roomId]) {
-                    var init = (0, randomInt)(1, 100);
+                    var init = (0, randomInt)(1, 8);
                     status[roomId] = {
                         player1: { score: 0, puzzle: init },
-                        player2: { score: 0, puzzle: init }
+						player2: { score: 0, puzzle: init }
                     };
                     io.to(roomId).emit('message', { event: 'newPuzzle', data: { type: init } });
                 }
+				else
+				{
+					io.to(roomId).emit('error', 'game cannot be started');
+
+				}
             }
             else {
+				io.to(roomId).emit('error', 'game cannot be started by you');
                 console.log("Player ".concat(player, " tried to start the game, but only player1 can start."));
             }
         }
     });
+
 });
 }
 
