@@ -41,26 +41,93 @@
 ---
 
 #### Socket information
-- Server
+
+##### Server
+- Get New Puzzle
 ```
 {
-	Type:
-	Value: 
+	event: newPuzzle:
+	data:{
+		type: (int)
+	}
 }
 ```
 
-- Client
+- Get Opponment update
 ```
 {
-	playername
-	room number
-	info:
+	event: op_puzzle:
+	data:{
+		type: (int)
+	}
+}
+```
+- message
+```
+{
+	event: op_(next/action/...):
+	player: (player1/player2)
+	data:
 	{
-		Type: 
+		data (left/right/rotate):
 		Value:
 	}
 }
 ```
+
+
+- Error
+```
+{
+	event: error:
+	data:{
+		message
+	}
+}
+```
+---
+
+##### Client
+
+- joinRoom
+```
+{
+	roomId:
+}
+```
+- leaveRoom
+```
+{
+}
+```
+- start
+```
+{
+}
+```
+- end
+```
+{
+	winner:
+}
+```
+- message
+```
+{
+	event (next/action):
+	info:
+	{
+		data (left/right/rotate):
+		Value:
+	}
+}
+```
+
+
+
+-----------
+---
+---
 
 ## Start client & server
 ```
