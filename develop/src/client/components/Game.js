@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import Board from './Board';
-import socket from '../index';
 import { shapes, shapeIndex } from "../configs/shapes";
+import Board from './Board';
+import OpponentBoard from './OpponentBoard';
+import React, { useState, useEffect } from 'react';
+import socket from '../index';
 
 const Game = ({ room, playerName }) => {
 
-    const [ showBoard,    setShowBoard    ] = useState(false);
-    const [ initialShape, setInitialShape ] = useState([]);
+    const [ showBoard,          setShowBoard          ] = useState(false);
+    const [ initialShape,       setInitialShape       ] = useState([]);
+    const [ opponentPlayerName, setOpponentPlayerName ] = useState('');
 
     // start the game
     const handleStart = () => {
@@ -20,7 +22,11 @@ const Game = ({ room, playerName }) => {
         // receive start event and show the board
         const handleStartEvent = (data) => {
             console.log('received start event', data);
-            //setShowBoard(true);
+            if (data == 'player1') {
+                setOpponentPlayerName('player2');
+            } else {
+                setOpponentPlayerName('player1');
+            }
         };
     
         // receive initial block shape
@@ -58,12 +64,18 @@ const Game = ({ room, playerName }) => {
         <div>
             <h1>Red Tetris</h1>
             <p>Room: {room}</p>
-            <p>Player: {playerName}</p>
             {
                 showBoard ? 
                 (
-                    <div>
-                        <Board initialShape={initialShape} />
+                    <div style={{ display: 'flex'}}>
+                        <div style={{ margin: '50px' }}>
+                            <p>Player: {playerName}</p>
+                            <Board initialShape={initialShape} />
+                        </div>
+                        <div style={{ margin: '50px' }}>
+                            <p>Player: {opponentPlayerName}</p>
+                            <OpponentBoard initialShape={initialShape} />
+                        </div>
                     </div>
                 ) : (
                     <button onClick={handleStart} style={{ margin: '10px' }}>
