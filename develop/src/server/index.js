@@ -112,7 +112,7 @@ const initEngine = io => {
     socket.on('message', function (eventData) {
 		eventData = JSON.parse(eventData);
 		var socketInfo = socketToPlayer.get(socket.id);
-		const roomId = socketInfo.roomId;
+		const roomId = socketInfo.roomId, player = socketInfo.player;
 
         socket.to(roomId).emit('message', eventData);
         console.log("Message event sent to room ".concat(roomId), eventData);
@@ -120,7 +120,6 @@ const initEngine = io => {
 			data = eventData.info;
         if (event === 'next') {
             // var player = data.player;
-            var player = socketToPlayer.get(socket.id);
             if (player === 'player1') {
                 status[roomId].player1.puzzle += 1;
                 io.to(socket.id).emit('message', { event: 'newPuzzle', data: { type: status[roomId].player1.puzzle } });
@@ -144,7 +143,7 @@ const initEngine = io => {
     socket.on('start', function () {
         if (socketToPlayer.has(socket.id)) {
             var socketInfo = socketToPlayer.get(socket.id);
-            var roomId = socketInfo.roomId, player = socketInfo.player;
+            const roomId = socketInfo.roomId, player = socketInfo.player;
 
 			console.log("Start event sent to room ".concat(roomId, " by ").concat(player));
 			
