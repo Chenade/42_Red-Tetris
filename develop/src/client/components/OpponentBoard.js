@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
-import { useBoard } from "./useBoard";
+import { useOpponentBoard } from "./useOpponentBoard";
 
 const OpponentBoard = React.memo(({ initialShape }) => {
   
-  const [display, onKeyDown] = useBoard(initialShape);
+  const [display, onKeyDown] = useOpponentBoard(initialShape);
 
   useEffect(() => {
     // add event listener for keyInput
