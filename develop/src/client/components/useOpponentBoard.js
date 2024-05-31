@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { shapes } from "../configs/shapes";
 import { useInterval } from "../actions/useInterval";
-import socket from '../index';
 
 const ROW_COUNT = 20;
 const COLUMN_COUNT = 10;
 const TICK_INTERVAL = 500;
 
-export function useBoard(initialShape) {
+export function useOpponentBoard(initialShape) {
   // scene: background
   const [scene, setScene] = useState(
     Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0))
@@ -166,42 +165,21 @@ export function useBoard(initialShape) {
   }
 
   function onKeyDown(event) {
-    let eventData = {
-      event: 'action',
-      info: {
-        data: '',
-        value: ''
-      }
-    };
 
-    switch (event.key) {
+    switch (event) {
       case "ArrowRight":
         moveBlock(1, 0);
-        eventData.info.data = 'ArrowRight';
-        eventData.info.value = 0;
-        socket.emit('message', JSON.stringify(eventData));
-        event.preventDefault();
+        console.log('Move right');
         break;
       case "ArrowLeft":
         moveBlock(-1, 0);
-        eventData.info.data = 'ArrowLeft';
-        eventData.info.value = 1;
-        socket.emit('message', JSON.stringify(eventData));
-        event.preventDefault();
+        console.log('Move left');
         break;
       case "ArrowDown":
         moveBlock(0, 1);
-        eventData.info.data = 'ArrowDown';
-        eventData.info.value = 2;
-        socket.emit('message', JSON.stringify(eventData));
-        event.preventDefault();
         break;
       case "ArrowUp":
         rotateShape();
-        eventData.info.data = 'ArrowUp';
-        eventData.info.value = 3;
-        socket.emit('message', JSON.stringify(eventData));
-        event.preventDefault();
         break;
       default:
         break;
