@@ -166,22 +166,20 @@ export function useOpponentBoard(initialShape) {
 
   function onKeyDown(event) {
 
-    switch (event.key) {
+    switch (event) {
       case "ArrowRight":
         moveBlock(1, 0);
-        event.preventDefault();
+        console.log('Move right');
         break;
       case "ArrowLeft":
         moveBlock(-1, 0);
-        event.preventDefault();
+        console.log('Move left');
         break;
       case "ArrowDown":
         moveBlock(0, 1);
-        event.preventDefault();
         break;
       case "ArrowUp":
         rotateShape();
-        event.preventDefault();
         break;
       default:
         break;

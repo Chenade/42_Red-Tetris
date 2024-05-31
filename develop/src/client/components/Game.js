@@ -8,6 +8,9 @@ const Game = ({ room, playerName }) => {
 
     const [ showBoard,          setShowBoard          ] = useState(false);
     const [ initialShape,       setInitialShape       ] = useState([]);
+    const [ opponentAction,     setOpponentAction     ] = useState(null);
+    const [ index,              setIndex              ] = useState(0);
+
     // start the game
     const handleStart = () => {
         socket.emit('start', (response) => {
@@ -16,7 +19,6 @@ const Game = ({ room, playerName }) => {
     };
 
     useEffect(() => {
-    
         // receive initial block shape
         const handleMessageEvent = (message) => {
             console.log('received message', message);
@@ -28,18 +30,34 @@ const Game = ({ room, playerName }) => {
                 } else {
                     console.log('Received shape index is invalid:', init);
                 }
+            } else if (message.event === 'op_action') {
+                console.log('Opponent action:', message.data);
+                console.log('Player:', playerName);
+                console.log('Opponent:', message.data.player);
+                if (message.data.player !== playerName) {
+                    console.log('set opponent action:', message.data.data.data);
+                    setOpponentAction(prevAction => {
+                        console.log('Previous opponentAction:', prevAction);
+                        console.log('New opponentAction:', message.data.data.data);
+                        return message.data.data.data;
+                    });
+                    setIndex(prevIndex => {
+                        console.log('Previous index:', prevIndex);
+                        console.log('New index:', prevIndex + 1);
+                        return prevIndex + 1;
+                    });
+                }
             }
         };
-    
+
         // add listeners for start and message events
         socket.on('message', handleMessageEvent);
-    
+
         // Cleanup the listeners when the component unmounts
         return () => {
-            socket.off('start', handleStartEvent);
             socket.off('message', handleMessageEvent);
         };
-    }, []);
+    }, []); // Empty dependencies array since playerName doesn't change
 
     // when initialShape is set, show the board
     useEffect(() => {
@@ -61,7 +79,11 @@ const Game = ({ room, playerName }) => {
                         </div>
                         <div style={{ margin: '50px' }}>
                             <p>Opponent's Board</p>
-                            <OpponentBoard initialShape={initialShape} />
+                            <OpponentBoard 
+                                index={index}
+                                initialShape={initialShape} 
+                                opponentAction={opponentAction} 
+                            />
                         </div>
                     </div>
                 ) : (

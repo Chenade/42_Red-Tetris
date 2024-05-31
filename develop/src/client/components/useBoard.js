@@ -177,28 +177,28 @@ export function useBoard(initialShape) {
     switch (event.key) {
       case "ArrowRight":
         moveBlock(1, 0);
-        eventData.info.data = 'right';
+        eventData.info.data = 'ArrowRight';
         eventData.info.value = 0;
         socket.emit('message', JSON.stringify(eventData));
         event.preventDefault();
         break;
       case "ArrowLeft":
         moveBlock(-1, 0);
-        eventData.info.data = 'left';
+        eventData.info.data = 'ArrowLeft';
         eventData.info.value = 1;
         socket.emit('message', JSON.stringify(eventData));
         event.preventDefault();
         break;
       case "ArrowDown":
         moveBlock(0, 1);
-        eventData.info.data = 'down';
+        eventData.info.data = 'ArrowDown';
         eventData.info.value = 2;
         socket.emit('message', JSON.stringify(eventData));
         event.preventDefault();
         break;
       case "ArrowUp":
         rotateShape();
-        eventData.info.data = 'rotate';
+        eventData.info.data = 'ArrowUp';
         eventData.info.value = 3;
         socket.emit('message', JSON.stringify(eventData));
         event.preventDefault();

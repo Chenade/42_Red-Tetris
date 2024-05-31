@@ -1,22 +1,25 @@
 import React, { useEffect } from "react";
 import { useOpponentBoard } from "./useOpponentBoard";
 
-const OpponentBoard = React.memo(({ initialShape }) => {
+const OpponentBoard = React.memo(({ initialShape, opponentAction, index }) => {
   
   const [display, onKeyDown] = useOpponentBoard(initialShape);
 
   useEffect(() => {
-    // add event listener for keyInput
-    const handleKeyDown = (event) => {
-      onKeyDown(event);
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [onKeyDown]);
+    console.log('Opponent action in OpponentBoard:', opponentAction);
+    if (opponentAction !== null) {
+      if (opponentAction === 'ArrowRight') {
+        console.log('Move right');
+      } else if (opponentAction === 'ArrowLeft') {
+        console.log('Move left');
+      } else if (opponentAction === 'ArrowDown') {
+        console.log('Move down');
+      } else if (opponentAction === 'ArrowUp') {
+        console.log('Rotate');
+      }
+      onKeyDown(opponentAction);
+    }
+  }, [index]);
 
   return (
     <div>
