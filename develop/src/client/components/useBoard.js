@@ -7,6 +7,14 @@ const ROW_COUNT = 20;
 const COLUMN_COUNT = 10;
 const TICK_INTERVAL = 500;
 
+let eventData = {
+  event: 'action',
+  info: {
+    data: '',
+    value: ''
+  }
+};
+
 export function useBoard(initialShape) {
   // scene: background
   const [scene, setScene] = useState(
@@ -76,6 +84,9 @@ export function useBoard(initialShape) {
     // update scene
     if (rowsRemoved > 0) {
       setScene(newScene);
+      eventData.info.data = 'removeRows';
+      eventData.info.value = rowsRemoved;
+      socket.emit('message', JSON.stringify(eventData));
     }
   }
 
@@ -166,13 +177,6 @@ export function useBoard(initialShape) {
   }
 
   function onKeyDown(event) {
-    let eventData = {
-      event: 'action',
-      info: {
-        data: '',
-        value: ''
-      }
-    };
 
     switch (event.key) {
       case "ArrowRight":
@@ -208,5 +212,12 @@ export function useBoard(initialShape) {
     }
   }
 
-  return [display, onKeyDown];
+  function addRows(addRowCount) {
+    // add rows to the bottom
+    console.log('Add rows2', addRowCount);
+
+    // next action!!!![TO DO]
+  }
+
+  return [display, onKeyDown, addRows];
 }

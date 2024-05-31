@@ -6,10 +6,12 @@ import socket from '../index';
 
 const Game = ({ room, playerName }) => {
 
-    const [ showBoard,          setShowBoard          ] = useState(false);
+    const [ addRowCount,        setAddRowCount        ] = useState(0);
+    const [ index,              setIndex              ] = useState(0);
+    const [ indexRemoved,       setIndexRemoved       ] = useState(0);
     const [ initialShape,       setInitialShape       ] = useState([]);
     const [ opponentAction,     setOpponentAction     ] = useState(null);
-    const [ index,              setIndex              ] = useState(0);
+    const [ showBoard,          setShowBoard          ] = useState(false);
 
     // start the game
     const handleStart = () => {
@@ -31,21 +33,21 @@ const Game = ({ room, playerName }) => {
                     console.log('Received shape index is invalid:', init);
                 }
             } else if (message.event === 'op_action') {
-                console.log('Opponent action:', message.data);
-                console.log('Player:', playerName);
-                console.log('Opponent:', message.data.player);
                 if (message.data.player !== playerName) {
-                    console.log('set opponent action:', message.data.data.data);
-                    setOpponentAction(prevAction => {
-                        console.log('Previous opponentAction:', prevAction);
-                        console.log('New opponentAction:', message.data.data.data);
-                        return message.data.data.data;
-                    });
-                    setIndex(prevIndex => {
-                        console.log('Previous index:', prevIndex);
-                        console.log('New index:', prevIndex + 1);
-                        return prevIndex + 1;
-                    });
+                    const action = message.data.data.data;
+
+                    if (action === 'removeRows') {
+                        setAddRowCount(message.data.data.value);
+                        setIndexRemoved(prevIndexRemoved => {
+                            return prevIndexRemoved + 1;
+                        });
+
+                    } else {
+                        setOpponentAction(action);
+                        setIndex(prevIndex => {
+                            return prevIndex + 1;
+                        });
+                    }
                 }
             }
         };
@@ -57,7 +59,7 @@ const Game = ({ room, playerName }) => {
         return () => {
             socket.off('message', handleMessageEvent);
         };
-    }, []); // Empty dependencies array since playerName doesn't change
+    }, []);
 
     // when initialShape is set, show the board
     useEffect(() => {
@@ -75,7 +77,11 @@ const Game = ({ room, playerName }) => {
                     <div style={{ display: 'flex'}}>
                         <div style={{ margin: '50px' }}>
                             <p>My Board</p>
-                            <Board initialShape={initialShape} />
+                            <Board
+                                addRowCount={addRowCount}
+                                indexRemoved={indexRemoved}
+                                initialShape={initialShape}
+                            />
                         </div>
                         <div style={{ margin: '50px' }}>
                             <p>Opponent's Board</p>
