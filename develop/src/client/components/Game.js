@@ -8,8 +8,6 @@ const Game = ({ room, playerName }) => {
 
     const [ showBoard,          setShowBoard          ] = useState(false);
     const [ initialShape,       setInitialShape       ] = useState([]);
-    const [ opponentPlayerName, setOpponentPlayerName ] = useState('');
-
     // start the game
     const handleStart = () => {
         socket.emit('start', (response) => {
@@ -18,16 +16,6 @@ const Game = ({ room, playerName }) => {
     };
 
     useEffect(() => {
-
-        // receive start event and show the board
-        const handleStartEvent = (data) => {
-            console.log('received start event', data);
-            if (data == 'player1') {
-                setOpponentPlayerName('player2');
-            } else {
-                setOpponentPlayerName('player1');
-            }
-        };
     
         // receive initial block shape
         const handleMessageEvent = (message) => {
@@ -44,7 +32,6 @@ const Game = ({ room, playerName }) => {
         };
     
         // add listeners for start and message events
-        socket.on('start', handleStartEvent);
         socket.on('message', handleMessageEvent);
     
         // Cleanup the listeners when the component unmounts
@@ -69,11 +56,11 @@ const Game = ({ room, playerName }) => {
                 (
                     <div style={{ display: 'flex'}}>
                         <div style={{ margin: '50px' }}>
-                            <p>Player: {playerName}</p>
+                            <p>My Board</p>
                             <Board initialShape={initialShape} />
                         </div>
                         <div style={{ margin: '50px' }}>
-                            <p>Player: {opponentPlayerName}</p>
+                            <p>Opponent's Board</p>
                             <OpponentBoard initialShape={initialShape} />
                         </div>
                     </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { shapes } from "../configs/shapes";
 import { useInterval } from "../actions/useInterval";
+import socket from '../index';
 
 const ROW_COUNT = 20;
 const COLUMN_COUNT = 10;
@@ -165,21 +166,41 @@ export function useBoard(initialShape) {
   }
 
   function onKeyDown(event) {
+    let eventData = {
+      event: 'action',
+      info: {
+        data: '',
+        value: ''
+      }
+    };
+
     switch (event.key) {
       case "ArrowRight":
         moveBlock(1, 0);
+        eventData.info.data = 'right';
+        eventData.info.value = 0;
+        socket.emit('message', JSON.stringify(eventData));
         event.preventDefault();
         break;
       case "ArrowLeft":
         moveBlock(-1, 0);
+        eventData.info.data = 'left';
+        eventData.info.value = 1;
+        socket.emit('message', JSON.stringify(eventData));
         event.preventDefault();
         break;
       case "ArrowDown":
         moveBlock(0, 1);
+        eventData.info.data = 'down';
+        eventData.info.value = 2;
+        socket.emit('message', JSON.stringify(eventData));
         event.preventDefault();
         break;
       case "ArrowUp":
         rotateShape();
+        eventData.info.data = 'rotate';
+        eventData.info.value = 3;
+        socket.emit('message', JSON.stringify(eventData));
         event.preventDefault();
         break;
       default:
