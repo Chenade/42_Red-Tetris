@@ -1,25 +1,25 @@
 import React, { useEffect } from "react";
 import { useOpponentBoard } from "./useOpponentBoard";
 
-const OpponentBoard = React.memo(({ initialShape, opponentAction, index }) => {
+const OpponentBoard = React.memo(({ 
+  addPenaltyRowCount,
+  index,
+  indexPenaltyAdded,
+  initialShape,
+  opponentAction,
+ }) => {
   
-  const [display, onKeyDown] = useOpponentBoard(initialShape);
+  const [display, onKeyDown, addPenaltyRows] = useOpponentBoard(initialShape);
 
   useEffect(() => {
-    console.log('Opponent action in OpponentBoard:', opponentAction);
     if (opponentAction !== null) {
-      if (opponentAction === 'ArrowRight') {
-        console.log('Move right');
-      } else if (opponentAction === 'ArrowLeft') {
-        console.log('Move left');
-      } else if (opponentAction === 'ArrowDown') {
-        console.log('Move down');
-      } else if (opponentAction === 'ArrowUp') {
-        console.log('Rotate');
-      }
       onKeyDown(opponentAction);
     }
   }, [index]);
+
+  useEffect(() => {
+    addPenaltyRows(addPenaltyRowCount);
+  }, [indexPenaltyAdded]);
 
   return (
     <div>
@@ -39,7 +39,7 @@ const OpponentBoard = React.memo(({ initialShape, opponentAction, index }) => {
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
-                      backgroundColor: cell === 0 ? "white" : cell === 1 ? "blue" : "transparent"
+                      backgroundColor: cell === 0 ? "white" : cell === 1 ? "blue" : cell === 2 ? "gray" : "transparent"
                     }}
                   >
                     {cell}

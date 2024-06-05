@@ -7,8 +7,10 @@ import socket from '../index';
 const Game = ({ room, playerName }) => {
 
     const [ addRowCount,        setAddRowCount        ] = useState(0);
+    const [ addPenaltyRowCount, setAddPenaltyRowCount ] = useState(0);
     const [ index,              setIndex              ] = useState(0);
     const [ indexRemoved,       setIndexRemoved       ] = useState(0);
+    const [ indexPenaltyAdded,  setIndexPenaltyAdded  ] = useState(0);
     const [ initialShape,       setInitialShape       ] = useState([]);
     const [ opponentAction,     setOpponentAction     ] = useState(null);
     const [ showBoard,          setShowBoard          ] = useState(false);
@@ -16,18 +18,15 @@ const Game = ({ room, playerName }) => {
     // start the game
     const handleStart = () => {
         socket.emit('start', (response) => {
-            console.log('emit start and received response', response);
         });
     };
 
     useEffect(() => {
         // receive initial block shape
         const handleMessageEvent = (message) => {
-            console.log('received message', message);
             if (message.event === 'newPuzzle') {
                 const init = message.data.type;
                 if (0 <= init && init < 7) {
-                    console.log('set this shape as initialShape: ', shapeIndex[init]);
                     setInitialShape(shapes[shapeIndex[init]]);
                 } else {
                     console.log('Received shape index is invalid:', init);
@@ -42,6 +41,11 @@ const Game = ({ room, playerName }) => {
                             return prevIndexRemoved + 1;
                         });
 
+                    } else if (action === 'addPenaltyRows') {
+                        setAddPenaltyRowCount(message.data.data.value);
+                        setIndexPenaltyAdded(prevIndexPenaltyAdded => {
+                            return prevIndexPenaltyAdded + 1;
+                        });
                     } else {
                         setOpponentAction(action);
                         setIndex(prevIndex => {
@@ -86,7 +90,9 @@ const Game = ({ room, playerName }) => {
                         <div style={{ margin: '50px' }}>
                             <p>Opponent's Board</p>
                             <OpponentBoard 
+                                addPenaltyRowCount={addPenaltyRowCount}
                                 index={index}
+                                indexPenaltyAdded={indexPenaltyAdded}
                                 initialShape={initialShape} 
                                 opponentAction={opponentAction} 
                             />

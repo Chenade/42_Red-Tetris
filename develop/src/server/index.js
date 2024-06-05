@@ -151,7 +151,7 @@ const initEngine = io => {
 			if (player === 'player1') {
                 io.to(roomId).emit('start', player);
                 if (!status[roomId]) {
-                    var init = (0, randomInt)(1, 8);
+                    var init = (0, randomInt)(1, 7);
                     status[roomId] = {
                         player1: { score: 0, puzzle: init },
 						player2: { score: 0, puzzle: init }

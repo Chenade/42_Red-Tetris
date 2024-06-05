@@ -73,7 +73,7 @@ export function useBoard(initialShape) {
 
   function removeRows() {
     // Remove any completed rows
-    let newScene = scene.filter((row) => row.some((cell) => cell === 0));
+    let newScene = scene.filter((row) => row.some((cell) => cell === 0 || cell === 2));
 
     // Add new rows at the top
     const rowsRemoved = ROW_COUNT - newScene.length;
@@ -81,9 +81,9 @@ export function useBoard(initialShape) {
       newScene.unshift(Array(COLUMN_COUNT).fill(0));
     }
 
-    // update scene
+    // Update scene
     if (rowsRemoved > 0) {
-      setScene(newScene);
+      setScene(newScene); // newScene is a JavaScript array, not JSON
       eventData.info.data = 'removeRows';
       eventData.info.value = rowsRemoved;
       socket.emit('message', JSON.stringify(eventData));
@@ -125,15 +125,12 @@ export function useBoard(initialShape) {
     }
     // only when move is valid, change the position of block
     setPosition(newPosition);
-    console.log("newPosition", newPosition);
-
     return true;
   }
 
   function endGame() {
     // if the block is at the top of the stage
     if (position.y === 0) {
-      console.log("Game Over");
       return true;
     }
     return false;
@@ -213,10 +210,30 @@ export function useBoard(initialShape) {
   }
 
   function addRows(addRowCount) {
-    // add rows to the bottom
-    console.log('Add rows2', addRowCount);
+    if (addRowCount > 0) {
+      
+      addRowCount *= 2;
 
-    // next action!!!![TO DO]
+      socket.emit('message', JSON.stringify({ event: 'action', info: { data: 'addPenaltyRows', value: addRowCount } }));
+
+      // Create a deep copy of the scene array
+      let newScene = JSON.parse(JSON.stringify(scene));
+
+      // Add new rows at the bottom
+      for (let i = 0; i < addRowCount; i++) {
+        newScene.push(Array(COLUMN_COUNT).fill(2));
+      }
+
+      // Create a new array with the same dimensions as the board
+      let nextScene = Array.from({ length: ROW_COUNT }, (_, index) => {
+        if (index < ROW_COUNT - addRowCount) {
+          return newScene[index + addRowCount];
+        } else {
+          return Array(COLUMN_COUNT).fill(2);
+        }
+      });
+      setScene(nextScene);
+    }
   }
 
   return [display, onKeyDown, addRows];

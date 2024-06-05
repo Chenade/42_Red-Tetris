@@ -64,7 +64,7 @@ export function useOpponentBoard(initialShape) {
 
   function removeRows() {
     // Remove any completed rows
-    let newScene = scene.filter((row) => row.some((cell) => cell === 0));
+    let newScene = scene.filter((row) => row.some((cell) => cell === 0 || cell === 2));
 
     // Add new rows at the top
     const rowsRemoved = ROW_COUNT - newScene.length;
@@ -113,15 +113,12 @@ export function useOpponentBoard(initialShape) {
     }
     // only when move is valid, change the position of block
     setPosition(newPosition);
-    console.log("newPosition", newPosition);
-
     return true;
   }
 
   function endGame() {
     // if the block is at the top of the stage
     if (position.y === 0) {
-      console.log("Game Over");
       return true;
     }
     return false;
@@ -169,11 +166,9 @@ export function useOpponentBoard(initialShape) {
     switch (event) {
       case "ArrowRight":
         moveBlock(1, 0);
-        console.log('Move right');
         break;
       case "ArrowLeft":
         moveBlock(-1, 0);
-        console.log('Move left');
         break;
       case "ArrowDown":
         moveBlock(0, 1);
@@ -186,5 +181,30 @@ export function useOpponentBoard(initialShape) {
     }
   }
 
-  return [display, onKeyDown];
+  
+  function addPenaltyRows(addRowCount) {
+    if (addRowCount > 0) {
+      // Create a deep copy of the scene array
+      let newScene = JSON.parse(JSON.stringify(scene));
+
+      // Add new rows at the bottom
+      for (let i = 0; i < addRowCount; i++) {
+        newScene.push(Array(COLUMN_COUNT).fill(2));
+      }
+
+      // Create a new array with the same dimensions as the board
+      let nextScene = Array.from({ length: ROW_COUNT }, (_, index) => {
+        if (index < ROW_COUNT - addRowCount) {
+          return newScene[index + addRowCount];
+        } else {
+          return Array(COLUMN_COUNT).fill(2);
+        }
+      });
+
+      setScene(nextScene);
+    }
+
+  }
+
+  return [display, onKeyDown, addPenaltyRows];
 }
