@@ -9,12 +9,10 @@ const JoinPage = ({ onJoinSuccess }) => {
         socket.emit('joinRoom', room);
     
         socket.on('joinRoomSuccess', (response) => {
-            console.log(response);
             onJoinSuccess(room, response.player);
         });
     
         socket.on('joinRoomFailed', (response) => {
-            console.log(response);
             setError(response);
         });
     };

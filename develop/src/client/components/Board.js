@@ -1,9 +1,13 @@
 import React, { useEffect } from "react";
 import { useBoard } from "./useBoard";
 
-const Board = React.memo(({ initialShape }) => {
+const Board = React.memo(({ 
+  addRowCount,
+  indexRemoved, 
+  initialShape, 
+}) => {
   
-  const [display, onKeyDown] = useBoard(initialShape);
+  const [display, onKeyDown, addRows] = useBoard(initialShape);
 
   useEffect(() => {
     // add event listener for keyInput
@@ -17,6 +21,10 @@ const Board = React.memo(({ initialShape }) => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [onKeyDown]);
+
+  useEffect(() => {
+    addRows(addRowCount);
+  }, [indexRemoved]);
 
   return (
     <div>
@@ -36,7 +44,7 @@ const Board = React.memo(({ initialShape }) => {
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
-                      backgroundColor: cell === 0 ? "white" : cell === 1 ? "red" : "transparent"
+                      backgroundColor: cell === 0 ? "white" : cell === 1 ? "red" : cell === 2 ? "gray" : "transparent"
                     }}
                   >
                     {cell}

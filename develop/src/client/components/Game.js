@@ -6,46 +6,52 @@ import socket from '../index';
 
 const Game = ({ room, playerName }) => {
 
-    const [ showBoard,          setShowBoard          ] = useState(false);
+    const [ addRowCount,        setAddRowCount        ] = useState(0);
+    const [ addPenaltyRowCount, setAddPenaltyRowCount ] = useState(0);
+    const [ index,              setIndex              ] = useState(0);
+    const [ indexRemoved,       setIndexRemoved       ] = useState(0);
+    const [ indexPenaltyAdded,  setIndexPenaltyAdded  ] = useState(0);
     const [ initialShape,       setInitialShape       ] = useState([]);
     const [ opponentAction,     setOpponentAction     ] = useState(null);
-    const [ index,              setIndex              ] = useState(0);
+    const [ showBoard,          setShowBoard          ] = useState(false);
 
     // start the game
     const handleStart = () => {
         socket.emit('start', (response) => {
-            console.log('emit start and received response', response);
         });
     };
 
     useEffect(() => {
         // receive initial block shape
         const handleMessageEvent = (message) => {
-            console.log('received message', message);
             if (message.event === 'newPuzzle') {
                 const init = message.data.type;
                 if (0 <= init && init < 7) {
-                    console.log('set this shape as initialShape: ', shapeIndex[init]);
                     setInitialShape(shapes[shapeIndex[init]]);
                 } else {
                     console.log('Received shape index is invalid:', init);
                 }
             } else if (message.event === 'op_action') {
-                console.log('Opponent action:', message.data);
-                console.log('Player:', playerName);
-                console.log('Opponent:', message.data.player);
                 if (message.data.player !== playerName) {
-                    console.log('set opponent action:', message.data.data.data);
-                    setOpponentAction(prevAction => {
-                        console.log('Previous opponentAction:', prevAction);
-                        console.log('New opponentAction:', message.data.data.data);
-                        return message.data.data.data;
-                    });
-                    setIndex(prevIndex => {
-                        console.log('Previous index:', prevIndex);
-                        console.log('New index:', prevIndex + 1);
-                        return prevIndex + 1;
-                    });
+                    const action = message.data.data.data;
+
+                    if (action === 'removeRows') {
+                        setAddRowCount(message.data.data.value);
+                        setIndexRemoved(prevIndexRemoved => {
+                            return prevIndexRemoved + 1;
+                        });
+
+                    } else if (action === 'addPenaltyRows') {
+                        setAddPenaltyRowCount(message.data.data.value);
+                        setIndexPenaltyAdded(prevIndexPenaltyAdded => {
+                            return prevIndexPenaltyAdded + 1;
+                        });
+                    } else {
+                        setOpponentAction(action);
+                        setIndex(prevIndex => {
+                            return prevIndex + 1;
+                        });
+                    }
                 }
             }
         };
@@ -57,7 +63,7 @@ const Game = ({ room, playerName }) => {
         return () => {
             socket.off('message', handleMessageEvent);
         };
-    }, []); // Empty dependencies array since playerName doesn't change
+    }, []);
 
     // when initialShape is set, show the board
     useEffect(() => {
@@ -75,12 +81,18 @@ const Game = ({ room, playerName }) => {
                     <div style={{ display: 'flex'}}>
                         <div style={{ margin: '50px' }}>
                             <p>My Board</p>
-                            <Board initialShape={initialShape} />
+                            <Board
+                                addRowCount={addRowCount}
+                                indexRemoved={indexRemoved}
+                                initialShape={initialShape}
+                            />
                         </div>
                         <div style={{ margin: '50px' }}>
                             <p>Opponent's Board</p>
                             <OpponentBoard 
+                                addPenaltyRowCount={addPenaltyRowCount}
                                 index={index}
+                                indexPenaltyAdded={indexPenaltyAdded}
                                 initialShape={initialShape} 
                                 opponentAction={opponentAction} 
                             />
