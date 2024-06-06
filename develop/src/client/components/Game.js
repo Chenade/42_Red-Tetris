@@ -14,6 +14,9 @@ const Game = ({ room, playerName }) => {
     const [ initialShape,       setInitialShape       ] = useState([]);
     const [ opponentAction,     setOpponentAction     ] = useState(null);
     const [ showBoard,          setShowBoard          ] = useState(false);
+    const [ message,            setMessage            ] = useState('');
+    const [ gameEnd,            setGameEnd            ] = useState(false);
+    const [ opponentGameEnd,    setOpponentGameEnd    ] = useState(false);
 
     // start the game
     const handleStart = () => {
@@ -46,11 +49,23 @@ const Game = ({ room, playerName }) => {
                         setIndexPenaltyAdded(prevIndexPenaltyAdded => {
                             return prevIndexPenaltyAdded + 1;
                         });
+                    } else if (action === 'gameover') {
+                        socket.emit('message', JSON.stringify({ event: 'action', info: { data: 'gameEndWithWin' } }));
+                        setMessage(message.data.player + ' is Game Over. You Win!');
+                        setGameEnd(true);
+                    } else if (action === 'gameEndWithWin') {
+                        setOpponentGameEnd(true);
                     } else {
                         setOpponentAction(action);
                         setIndex(prevIndex => {
                             return prevIndex + 1;
                         });
+                    }
+                } else {
+                    const action = message.data.data.data;
+                    if (action === 'gameover') {
+                        setMessage('Game Over!!!');
+                        setGameEnd(true);
                     }
                 }
             }
@@ -75,6 +90,8 @@ const Game = ({ room, playerName }) => {
         <div>
             <h1>Red Tetris</h1>
             <p>Room: {room}</p>
+            <p>Player: {playerName}</p>
+            <p style={{ color: 'red', fontWeight: 'bold' }}>{message}</p>
             {
                 showBoard ? 
                 (
@@ -83,6 +100,7 @@ const Game = ({ room, playerName }) => {
                             <p>My Board</p>
                             <Board
                                 addRowCount={addRowCount}
+                                gameEnd={gameEnd}
                                 indexRemoved={indexRemoved}
                                 initialShape={initialShape}
                             />
@@ -91,6 +109,7 @@ const Game = ({ room, playerName }) => {
                             <p>Opponent's Board</p>
                             <OpponentBoard 
                                 addPenaltyRowCount={addPenaltyRowCount}
+                                gameEnd={opponentGameEnd}
                                 index={index}
                                 indexPenaltyAdded={indexPenaltyAdded}
                                 initialShape={initialShape} 

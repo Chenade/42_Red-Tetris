@@ -206,5 +206,9 @@ export function useOpponentBoard(initialShape) {
 
   }
 
-  return [display, onKeyDown, addPenaltyRows];
+  function endGameWithWin() {
+    setGameover(true);
+  }
+
+  return [display, onKeyDown, addPenaltyRows, endGameWithWin];
 }

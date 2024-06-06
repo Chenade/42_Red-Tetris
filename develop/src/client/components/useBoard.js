@@ -140,6 +140,7 @@ export function useBoard(initialShape) {
     // keep the block in the scene
     setScene(mergeIntoStage(scene, shape, position));
     if (endGame()) {
+      socket.emit('message', JSON.stringify({ event: 'action', info: { data: 'gameover' } }));
       setGameover(true);
       return;
     }
@@ -236,5 +237,9 @@ export function useBoard(initialShape) {
     }
   }
 
-  return [display, onKeyDown, addRows];
+  function endGameWithWin() {
+    setGameover(true);
+  }
+
+  return [display, onKeyDown, addRows, endGame, endGameWithWin];
 }
