@@ -7,6 +7,7 @@ import {
   JOIN_ROOM_SUCCESS,
   JOIN_ROOM, 
   RECEIVE_MESSAGE,
+  SEND_MESSAGE,
   SET_SOCKET,
   START_GAME,
 } from '../actions/alert'
@@ -30,9 +31,11 @@ const reducer = (state = {} , action) => {
     case START_GAME:
       return { ...state, socket: action.payload.socket }
     case RECEIVE_MESSAGE:
-      return { ...state, message: action.payload.message }
+      return { ...state, socket: action.payload.socket, message: action.payload.message }
     case GAME_END_WITH_WIN:
-      return { socket: action.payload }
+      return { socket: action.payload.socket }
+    case SEND_MESSAGE:
+      return { socket: action.payload.socket }
     default: 
       return state
   }
