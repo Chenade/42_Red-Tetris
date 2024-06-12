@@ -8,8 +8,8 @@ const JoinPage = ({ onJoinSuccess }) => {
 
     useEffect(() => {
     
-        store.dispatch(joinRoomSuccess(store.getState().socket, room));
-        store.dispatch(joinRoomFailed(store.getState().socket, room));
+        store.dispatch(joinRoomSuccess(store.getState().socket));
+        store.dispatch(joinRoomFailed(store.getState().socket));
     
         const unsubscribe = store.subscribe(() => {
           if (store.getState().join) {

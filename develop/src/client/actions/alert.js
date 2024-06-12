@@ -5,6 +5,8 @@ export const DISCONNECT_SOCKET = 'DISCONNECT_SOCKET'
 export const JOIN_ROOM = 'JOIN_ROOM'
 export const JOIN_ROOM_SUCCESS = 'JOIN_ROOM_SUCCESS'
 export const JOIN_ROOM_FAILED = 'JOIN_ROOM_FAILED'
+export const START_GAME = 'START_GAME'
+export const RECEIVE_MESSAGE = 'RECEIVE_MESSAGE'
 
 export const alert = (message) => {
   return {
@@ -48,7 +50,7 @@ export const joinRoom = (socket, room) => {
   }
 }
 
-export const joinRoomSuccess = (socket, room) => {
+export const joinRoomSuccess = (socket) => {
   return (dispatch) => {
     socket.on('joinRoomSuccess', (data) => {
       dispatch({
@@ -59,12 +61,31 @@ export const joinRoomSuccess = (socket, room) => {
   }
 }
 
-export const joinRoomFailed = (socket, room) => {
+export const joinRoomFailed = (socket) => {
   return (dispatch) => {
     socket.on('joinRoomFailed', (data) => {
       dispatch({
         type: JOIN_ROOM_FAILED,
         payload: { socket, join: false, res: data }
+      });
+    });
+  }
+}
+
+export const startGame = (socket) => {
+  socket.emit('start');
+  return {
+    type: START_GAME,
+    payload: { socket }
+  }
+}
+
+export const receiveMessage = (socket) => {
+  return (dispatch) => {
+    socket.on('message', (data) => {
+      dispatch({
+        type: RECEIVE_MESSAGE,
+        payload: { socket, message: data }
       });
     });
   }

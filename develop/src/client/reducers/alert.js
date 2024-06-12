@@ -5,7 +5,9 @@ import {
   JOIN_ROOM_FAILED,
   JOIN_ROOM_SUCCESS,
   JOIN_ROOM, 
+  RECEIVE_MESSAGE,
   SET_SOCKET,
+  START_GAME,
 } from '../actions/alert'
 
 const reducer = (state = {} , action) => {
@@ -24,7 +26,11 @@ const reducer = (state = {} , action) => {
       return { ...state, join: action.payload.join, res: action.payload.res }
     case JOIN_ROOM_FAILED:
       return { ...state, join: action.payload.join, res: action.payload.res }
-      default: 
+    case START_GAME:
+      return { ...state, socket: action.payload.socket }
+    case RECEIVE_MESSAGE:
+      return { ...state, message: action.payload.message }
+    default: 
       return state
   }
 }
