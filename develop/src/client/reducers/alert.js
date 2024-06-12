@@ -2,6 +2,7 @@ import {
   ALERT_POP, 
   CONNECT_SOCKET, 
   DISCONNECT_SOCKET, 
+  GAME_END_WITH_WIN,
   JOIN_ROOM_FAILED,
   JOIN_ROOM_SUCCESS,
   JOIN_ROOM, 
@@ -30,6 +31,8 @@ const reducer = (state = {} , action) => {
       return { ...state, socket: action.payload.socket }
     case RECEIVE_MESSAGE:
       return { ...state, message: action.payload.message }
+    case GAME_END_WITH_WIN:
+      return { socket: action.payload }
     default: 
       return state
   }

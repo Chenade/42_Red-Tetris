@@ -7,6 +7,7 @@ export const JOIN_ROOM_SUCCESS = 'JOIN_ROOM_SUCCESS'
 export const JOIN_ROOM_FAILED = 'JOIN_ROOM_FAILED'
 export const START_GAME = 'START_GAME'
 export const RECEIVE_MESSAGE = 'RECEIVE_MESSAGE'
+export const GAME_END_WITH_WIN = 'GAME_END_WITH_WIN'
 
 export const alert = (message) => {
   return {
@@ -88,5 +89,13 @@ export const receiveMessage = (socket) => {
         payload: { socket, message: data }
       });
     });
+  }
+}
+
+export const gameEndWithWin = (socket) => {
+  socket.emit('message', JSON.stringify({ event: 'action', info: { data: 'gameEndWithWin' } }));
+  return {
+    type: GAME_END_WITH_WIN,
+    socket
   }
 }

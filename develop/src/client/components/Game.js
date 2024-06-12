@@ -2,9 +2,8 @@ import { shapes, shapeIndex } from "../configs/shapes";
 import Board from './Board';
 import OpponentBoard from './OpponentBoard';
 import React, { useState, useEffect } from 'react';
-import socket from '../index';
 import { store } from '../index';
-import { startGame, receiveMessage } from '../actions/alert';
+import { startGame, receiveMessage, gameEndWithWin } from '../actions/alert';
 
 const Game = ({ room, playerName }) => {
 
@@ -48,7 +47,7 @@ const Game = ({ room, playerName }) => {
                         return prevIndexPenaltyAdded + 1;
                     });
                 } else if (action === 'gameover') {
-                    socket.emit('message', JSON.stringify({ event: 'action', info: { data: 'gameEndWithWin' } }));
+                    store.dispatch(gameEndWithWin(store.getState().socket));
                     setMessage(message.data.player + ' is Game Over. You Win!');
                     setGameEnd(true);
                 } else if (action === 'gameEndWithWin') {
