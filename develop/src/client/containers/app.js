@@ -1,9 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux'
 import Game from '../components/Game';
 import JoinPage from '../components/JoinPage';
+import {store} from '../index'
+import socket from '../index';
+import { test } from '../actions/alert'
 
 const App = ({message}) => {
+
+  useEffect(() => {
+    
+    test(socket);
+
+    const unsubscribe = store.subscribe(() => {
+      console.log("state:", store.getState());
+    });
+
+    return () => {
+      unsubscribe();
+    };
+
+  }, []);
 
   const [playerInfo, setPlayerInfo] = useState(null);
 

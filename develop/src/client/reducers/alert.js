@@ -1,4 +1,4 @@
-import { ALERT_POP, SET_SOCKET, CONNECT_SOCKET, DISCONNECT_SOCKET } from '../actions/alert'
+import { ALERT_POP, SET_SOCKET, CONNECT_SOCKET, DISCONNECT_SOCKET, TEST_RECEIVED } from '../actions/alert'
 
 const reducer = (state = {} , action) => {
   switch(action.type){
@@ -10,6 +10,8 @@ const reducer = (state = {} , action) => {
       return { socket: action.socket }
     case DISCONNECT_SOCKET:
       return { socket: null }
+    case TEST_RECEIVED:
+      return { message: action.payload }
     default: 
       return state
   }
