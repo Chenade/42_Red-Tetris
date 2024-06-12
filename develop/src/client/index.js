@@ -22,8 +22,8 @@ const socket = io('http://localhost:3000');
 // Pass the `socket` instance to your Redux actions or components as needed
 // For example, you can dispatch an action to store the socket instance in the Redux store
 store.dispatch({ type: 'SET_SOCKET', payload: socket });
-store.dispatch({ type: 'CONNECT_SOCKET', payload: socket });
-store.dispatch({ type: 'DISCONNECT_SOCKET', payload: socket });
+store.dispatch({ type: 'CONNECT_SOCKET', payload: store.getState().socket });
+store.dispatch({ type: 'DISCONNECT_SOCKET', payload: store.getState().socket });
 
 ReactDom.render((
   <Provider store={store}>

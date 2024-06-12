@@ -1,20 +1,34 @@
-import React, { useState } from 'react';
-import socket from '../index';
+import React, { useState, useEffect } from 'react';
+import { store } from '../index';
+import { joinRoom, joinRoomSuccess, joinRoomFailed } from '../actions/alert'
 
 const JoinPage = ({ onJoinSuccess }) => {
     const [room, setRoom] = useState('');
     const [error, setError] = useState('');
 
+    useEffect(() => {
+    
+        store.dispatch(joinRoomSuccess(store.getState().socket, room));
+        store.dispatch(joinRoomFailed(store.getState().socket, room));
+    
+        const unsubscribe = store.subscribe(() => {
+          if (store.getState().join) {
+            onJoinSuccess(store.getState().res.roomId, store.getState().res.player);
+          } else {
+            if (store.getState().res) {
+              setError(store.getState().res);
+            }
+          }
+        });
+    
+        return () => {
+          unsubscribe();
+        };
+    
+      }, []);
+
     const handleJoin = () => {
-        socket.emit('joinRoom', room);
-    
-        socket.on('joinRoomSuccess', (response) => {
-            onJoinSuccess(room, response.player);
-        });
-    
-        socket.on('joinRoomFailed', (response) => {
-            setError(response);
-        });
+        store.dispatch(joinRoom(store.getState().socket, room));
     };
 
     return (

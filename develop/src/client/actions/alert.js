@@ -5,6 +5,9 @@ export const SET_SOCKET = 'SET_SOCKET'
 export const CONNECT_SOCKET = 'CONNECT_SOCKET'
 export const DISCONNECT_SOCKET = 'DISCONNECT_SOCKET'
 export const TEST_RECEIVED = 'TEST_RECEIVED'
+export const JOIN_ROOM = 'JOIN_ROOM'
+export const JOIN_ROOM_SUCCESS = 'JOIN_ROOM_SUCCESS'
+export const JOIN_ROOM_FAILED = 'JOIN_ROOM_FAILED'
 
 export const alert = (message) => {
   return {
@@ -47,5 +50,35 @@ export const disconnectSocket = (socket) => {
   return {
     type: DISCONNECT_SOCKET,
     socket
+  }
+}
+
+export const joinRoom = (socket, room) => {
+  socket.emit('joinRoom', room);
+  return {
+    type: JOIN_ROOM,
+    payload: { socket, room }
+  }
+}
+
+export const joinRoomSuccess = (socket, room) => {
+  return (dispatch) => {
+    socket.on('joinRoomSuccess', (data) => {
+      dispatch({
+        type: JOIN_ROOM_SUCCESS,
+        payload: { socket, join: true, res: data }
+      });
+    });
+  }
+}
+
+export const joinRoomFailed = (socket, room) => {
+  return (dispatch) => {
+    socket.on('joinRoomFailed', (data) => {
+      dispatch({
+        type: JOIN_ROOM_FAILED,
+        payload: { socket, join: false, res: data }
+      });
+    });
   }
 }
