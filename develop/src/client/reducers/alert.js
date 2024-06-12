@@ -17,7 +17,7 @@ const reducer = (state = {} , action) => {
     case ALERT_POP:
       return { message: action.message }
     case SET_SOCKET:
-      return { socket: action.payload }
+      return { socket: action.payload.socket }
     case CONNECT_SOCKET:
       return { socket: action.payload }
     case DISCONNECT_SOCKET:

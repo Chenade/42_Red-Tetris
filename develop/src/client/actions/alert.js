@@ -1,3 +1,4 @@
+import io from 'socket.io-client';
 export const ALERT_POP = 'ALERT_POP'
 export const SET_SOCKET = 'SET_SOCKET'
 export const CONNECT_SOCKET = 'CONNECT_SOCKET'
@@ -17,10 +18,11 @@ export const alert = (message) => {
   }
 }
 
-export const setSocket = (socket) => {
+export const setSocket = () => {
+  const s = io('http://localhost:3000');
   return {
     type: SET_SOCKET,
-    socket
+    payload: { socket: s }
   }
 }
 
