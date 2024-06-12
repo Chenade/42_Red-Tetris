@@ -3,11 +3,12 @@ import { useBoard } from "./useBoard";
 
 const Board = React.memo(({ 
   addRowCount,
+  gameEnd,
   indexRemoved, 
   initialShape, 
 }) => {
   
-  const [display, onKeyDown, addRows] = useBoard(initialShape);
+  const [display, onKeyDown, addRows, endGame, endGameWithWin] = useBoard(initialShape);
 
   useEffect(() => {
     // add event listener for keyInput
@@ -25,6 +26,12 @@ const Board = React.memo(({
   useEffect(() => {
     addRows(addRowCount);
   }, [indexRemoved]);
+
+  useEffect(() => {
+    if (gameEnd === true) {
+      endGameWithWin();
+    }
+  } , [gameEnd]);
 
   return (
     <div>

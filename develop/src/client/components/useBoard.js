@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { shapes } from "../configs/shapes";
 import { useInterval } from "../actions/useInterval";
-import socket from '../index';
+import { store } from '../index';
+import { sendMessage } from '../actions/alert';
+
 
 const ROW_COUNT = 20;
 const COLUMN_COUNT = 10;
@@ -86,7 +88,7 @@ export function useBoard(initialShape) {
       setScene(newScene); // newScene is a JavaScript array, not JSON
       eventData.info.data = 'removeRows';
       eventData.info.value = rowsRemoved;
-      socket.emit('message', JSON.stringify(eventData));
+      store.dispatch(sendMessage(store.getState().socket, JSON.stringify(eventData)));
     }
   }
 
@@ -140,6 +142,7 @@ export function useBoard(initialShape) {
     // keep the block in the scene
     setScene(mergeIntoStage(scene, shape, position));
     if (endGame()) {
+      store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'action', info: { data: 'gameover' } })));
       setGameover(true);
       return;
     }
@@ -180,28 +183,28 @@ export function useBoard(initialShape) {
         moveBlock(1, 0);
         eventData.info.data = 'ArrowRight';
         eventData.info.value = 0;
-        socket.emit('message', JSON.stringify(eventData));
+        store.dispatch(sendMessage(store.getState().socket, JSON.stringify(eventData)));
         event.preventDefault();
         break;
       case "ArrowLeft":
         moveBlock(-1, 0);
         eventData.info.data = 'ArrowLeft';
         eventData.info.value = 1;
-        socket.emit('message', JSON.stringify(eventData));
+        store.dispatch(sendMessage(store.getState().socket, JSON.stringify(eventData)));
         event.preventDefault();
         break;
       case "ArrowDown":
         moveBlock(0, 1);
         eventData.info.data = 'ArrowDown';
         eventData.info.value = 2;
-        socket.emit('message', JSON.stringify(eventData));
+        store.dispatch(sendMessage(store.getState().socket, JSON.stringify(eventData)));
         event.preventDefault();
         break;
       case "ArrowUp":
         rotateShape();
         eventData.info.data = 'ArrowUp';
         eventData.info.value = 3;
-        socket.emit('message', JSON.stringify(eventData));
+        store.dispatch(sendMessage(store.getState().socket, JSON.stringify(eventData)));
         event.preventDefault();
         break;
       default:
@@ -214,7 +217,7 @@ export function useBoard(initialShape) {
       
       addRowCount *= 2;
 
-      socket.emit('message', JSON.stringify({ event: 'action', info: { data: 'addPenaltyRows', value: addRowCount } }));
+      store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'action', info: { data: 'addPenaltyRows', value: addRowCount } })));
 
       // Create a deep copy of the scene array
       let newScene = JSON.parse(JSON.stringify(scene));
@@ -236,5 +239,9 @@ export function useBoard(initialShape) {
     }
   }
 
-  return [display, onKeyDown, addRows];
+  function endGameWithWin() {
+    setGameover(true);
+  }
+
+  return [display, onKeyDown, addRows, endGame, endGameWithWin];
 }

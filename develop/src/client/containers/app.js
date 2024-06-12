@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import Game from '../components/Game';
 import JoinPage from '../components/JoinPage';
 
-const App = ({message}) => {
+const App = () => {
 
   const [playerInfo, setPlayerInfo] = useState(null);
 
