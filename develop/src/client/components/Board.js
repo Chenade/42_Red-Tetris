@@ -6,9 +6,10 @@ const Board = React.memo(({
   gameEnd,
   indexRemoved, 
   initialShape, 
+  nextBlock
 }) => {
   
-  const [display, onKeyDown, addRows, endGame, endGameWithWin] = useBoard(initialShape);
+  const [display, onKeyDown, addRows, endGame, endGameWithWin] = useBoard(initialShape, nextBlock);
 
   useEffect(() => {
     // add event listener for keyInput

@@ -17,7 +17,7 @@ let eventData = {
   }
 };
 
-export function useBoard(initialShape) {
+export function useBoard(initialShape, nextBlock) {
   // scene: background
   const [scene, setScene] = useState(
     Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0))
@@ -139,6 +139,9 @@ export function useBoard(initialShape) {
   }
 
   function touchGround() {
+
+    store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'next' })));
+
     // keep the block in the scene
     setScene(mergeIntoStage(scene, shape, position));
     if (endGame()) {
@@ -147,7 +150,8 @@ export function useBoard(initialShape) {
       return;
     }
     // drop new block
-    setShape(shapes.J);
+    console.log('next block :', nextBlock);
+    setShape(nextBlock);
     setPosition({ x: 0, y: 0 });
   }
 

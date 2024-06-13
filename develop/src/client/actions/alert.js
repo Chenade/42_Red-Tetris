@@ -121,6 +121,7 @@ export const receiveMessage = (socket) => {
 
 export const gameEndWithWin = (socket) => {
   socket.emit('message', JSON.stringify({ event: 'action', info: { data: 'gameEndWithWin' } }));
+  socket.emit('end', 'player1'); // change playername
   return {
     type: GAME_END_WITH_WIN,
     payload: { socket }
