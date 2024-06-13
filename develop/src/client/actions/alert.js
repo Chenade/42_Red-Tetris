@@ -7,6 +7,8 @@ export const JOIN_ROOM = 'JOIN_ROOM'
 export const JOIN_ROOM_SUCCESS = 'JOIN_ROOM_SUCCESS'
 export const JOIN_ROOM_FAILED = 'JOIN_ROOM_FAILED'
 export const START_GAME = 'START_GAME'
+export const START_GAME_SUCCESS = 'START_GAME_SUCCESS'
+export const START_GAME_FAILED = 'START_GAME_FAILED'
 export const RECEIVE_MESSAGE = 'RECEIVE_MESSAGE'
 export const GAME_END_WITH_WIN = 'GAME_END_WITH_WIN'
 export const SEND_MESSAGE = 'SEND_MESSAGE'
@@ -81,6 +83,28 @@ export const startGame = (socket) => {
   return {
     type: START_GAME,
     payload: { socket }
+  }
+}
+
+export const startGameSuccess = (socket) => {
+  return (dispatch) => {
+    socket.on('start', (data) => {
+      dispatch({
+        type: START_GAME_SUCCESS,
+        payload: { socket, start: true, res: data }
+      });
+    });
+  }
+}
+
+export const startGameFailed = (socket) => {
+  return (dispatch) => {
+    socket.on('error', (data) => {
+      dispatch({
+        type: START_GAME_FAILED,
+        payload: { socket, start: false, res: data }
+      });
+    });
   }
 }
 

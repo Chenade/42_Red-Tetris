@@ -9,6 +9,8 @@ import {
   RECEIVE_MESSAGE,
   SEND_MESSAGE,
   SET_SOCKET,
+  START_GAME_FAILED,
+  START_GAME_SUCCESS,
   START_GAME,
 } from '../actions/alert'
 
@@ -30,6 +32,10 @@ const reducer = (state = {} , action) => {
       return { ...state, join: action.payload.join, res: action.payload.res }
     case START_GAME:
       return { ...state, socket: action.payload.socket }
+    case START_GAME_SUCCESS:
+      return { ...state, socket: action.payload.socket, res: action.payload.res, start: action.payload.start }
+    case START_GAME_FAILED:
+      return { ...state, socket: action.payload.socket, res: action.payload.res, start: action.payload.start }
     case RECEIVE_MESSAGE:
       return { ...state, socket: action.payload.socket, message: action.payload.message }
     case GAME_END_WITH_WIN:

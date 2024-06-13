@@ -3,7 +3,7 @@ import Board from './Board';
 import OpponentBoard from './OpponentBoard';
 import React, { useState, useEffect } from 'react';
 import { store } from '../index';
-import { startGame, receiveMessage, gameEndWithWin } from '../actions/alert';
+import { startGame, receiveMessage, gameEndWithWin, startGameSuccess, startGameFailed } from '../actions/alert';
 
 const Game = ({ room, playerName }) => {
 
@@ -18,6 +18,28 @@ const Game = ({ room, playerName }) => {
     const [ message,            setMessage            ] = useState('');
     const [ gameEnd,            setGameEnd            ] = useState(false);
     const [ opponentGameEnd,    setOpponentGameEnd    ] = useState(false);
+
+    useEffect(() => {
+    
+        store.dispatch(startGameSuccess(store.getState().socket));
+        store.dispatch(startGameFailed(store.getState().socket));
+    
+        const unsubscribe = store.subscribe(() => {
+          if (store.getState().start) {
+            setMessage('');
+          } else {
+            if (store.getState().res) {
+                console.log('Failed to start game due to: ', store.getState().res);
+                setMessage('Failed to start game.');
+            }
+          }
+        });
+    
+        return () => {
+          unsubscribe();
+        };
+    
+      }, []);
 
     const handleStart = () => {
         store.dispatch(startGame(store.getState().socket));
