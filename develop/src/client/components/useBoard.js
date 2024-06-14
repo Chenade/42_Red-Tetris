@@ -189,6 +189,17 @@ export function useBoard(
     }
   }
 
+  function verticalDrop() {
+    let y = 0;
+    while (y < ROW_COUNT) {
+      if (!moveBlock(0, y)) {
+        setPosition({ x: position.x, y: position.y + y - 1 });
+        break;
+      }
+      y++;
+    }
+  }
+
   function onKeyDown(event) {
 
     switch (event.key) {
@@ -217,6 +228,13 @@ export function useBoard(
         rotateShape();
         eventData.info.data = 'ArrowUp';
         eventData.info.value = 3;
+        store.dispatch(sendMessage(store.getState().socket, JSON.stringify(eventData)));
+        event.preventDefault();
+        break;
+      case " ":
+        verticalDrop();
+        eventData.info.data = 'Space';
+        eventData.info.value = 4;
         store.dispatch(sendMessage(store.getState().socket, JSON.stringify(eventData)));
         event.preventDefault();
         break;
