@@ -41,7 +41,7 @@ const JoinPage = ({ onJoinSuccess }) => {
                 onChange={(e) => setRoom(e.target.value)}
             />
             <button onClick={handleJoin}>Join</button>
-            {error && <p>{error}</p>}
+            {error && <p style={{ color: 'red' }}>{error}</p>}
         </div>
     );
 };

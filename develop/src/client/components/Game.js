@@ -3,7 +3,7 @@ import Board from './Board';
 import OpponentBoard from './OpponentBoard';
 import React, { useState, useEffect } from 'react';
 import { store } from '../index';
-import { startGame, receiveMessage, gameEndWithWin } from '../actions/alert';
+import { startGame, receiveMessage, gameEndWithWin, startGameSuccess, startGameFailed } from '../actions/alert';
 
 const Game = ({ room, playerName }) => {
 
@@ -18,6 +18,30 @@ const Game = ({ room, playerName }) => {
     const [ message,            setMessage            ] = useState('');
     const [ gameEnd,            setGameEnd            ] = useState(false);
     const [ opponentGameEnd,    setOpponentGameEnd    ] = useState(false);
+    const [ nextBlock,          setNextBlock          ] = useState(null);
+    const [ blockUpdateCount,  setBlockUpdateCount  ] = useState(0);
+
+    useEffect(() => {
+    
+        store.dispatch(startGameSuccess(store.getState().socket));
+        store.dispatch(startGameFailed(store.getState().socket));
+    
+        const unsubscribe = store.subscribe(() => {
+          if (store.getState().start) {
+            setMessage('');
+          } else {
+            if (store.getState().res) {
+                console.log('Failed to start game due to: ', store.getState().res);
+                setMessage('Failed to start game.');
+            }
+          }
+        });
+    
+        return () => {
+          unsubscribe();
+        };
+    
+      }, []);
 
     const handleStart = () => {
         store.dispatch(startGame(store.getState().socket));
@@ -27,7 +51,11 @@ const Game = ({ room, playerName }) => {
         if (message.event === 'newPuzzle') {
             const init = message.data.type;
             if (0 <= init && init < 7) {
-                setInitialShape(shapes[shapeIndex[init]]);
+                if (blockUpdateCount === 0) {
+                    setInitialShape(shapes[shapeIndex[init]]);
+                }
+                setNextBlock(shapes[shapeIndex[init]]);
+                setBlockUpdateCount(count => count + 1);
             } else {
                 console.log('Received shape index is invalid:', init);
             }
@@ -106,6 +134,8 @@ const Game = ({ room, playerName }) => {
                                 gameEnd={gameEnd}
                                 indexRemoved={indexRemoved}
                                 initialShape={initialShape}
+                                nextBlock={nextBlock}
+                                blockUpdateCount={blockUpdateCount}
                             />
                         </div>
                         <div style={{ margin: '50px' }}>

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { shapes } from "../configs/shapes";
 import { useInterval } from "../actions/useInterval";
 import { store } from '../index';
 import { sendMessage } from '../actions/alert';
@@ -17,7 +16,12 @@ let eventData = {
   }
 };
 
-export function useBoard(initialShape) {
+export function useBoard(
+  initialShape,
+  nextBlock,
+  blockUpdateCount
+) {
+
   // scene: background
   const [scene, setScene] = useState(
     Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0))
@@ -139,6 +143,9 @@ export function useBoard(initialShape) {
   }
 
   function touchGround() {
+
+    store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'next' })));
+
     // keep the block in the scene
     setScene(mergeIntoStage(scene, shape, position));
     if (endGame()) {
@@ -146,10 +153,16 @@ export function useBoard(initialShape) {
       setGameover(true);
       return;
     }
-    // drop new block
-    setShape(shapes.J);
+  }
+
+  function dropNewBlock() {
+    setShape(nextBlock);
     setPosition({ x: 0, y: 0 });
   }
+
+  useEffect(() => {
+    dropNewBlock();
+  }, [blockUpdateCount]);
 
   function tick() {
     // when drop to the bottom
@@ -173,6 +186,17 @@ export function useBoard(initialShape) {
     // if new shape is valid, update the shape
     if (validMove(position, rotatedShape)) {
       setShape(rotatedShape);
+    }
+  }
+
+  function verticalDrop() {
+    let y = 0;
+    while (y < ROW_COUNT) {
+      if (!moveBlock(0, y)) {
+        setPosition({ x: position.x, y: position.y + y - 1 });
+        break;
+      }
+      y++;
     }
   }
 
@@ -204,6 +228,13 @@ export function useBoard(initialShape) {
         rotateShape();
         eventData.info.data = 'ArrowUp';
         eventData.info.value = 3;
+        store.dispatch(sendMessage(store.getState().socket, JSON.stringify(eventData)));
+        event.preventDefault();
+        break;
+      case " ":
+        verticalDrop();
+        eventData.info.data = 'Space';
+        eventData.info.value = 4;
         store.dispatch(sendMessage(store.getState().socket, JSON.stringify(eventData)));
         event.preventDefault();
         break;

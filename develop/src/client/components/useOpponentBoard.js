@@ -161,6 +161,17 @@ export function useOpponentBoard(initialShape) {
     }
   }
 
+  function verticalDrop() {
+    let y = 0;
+    while (y < ROW_COUNT) {
+      if (!moveBlock(0, y)) {
+        setPosition({ x: position.x, y: position.y + y - 1 });
+        break;
+      }
+      y++;
+    }
+  }
+
   function onKeyDown(event) {
 
     switch (event) {
@@ -175,6 +186,9 @@ export function useOpponentBoard(initialShape) {
         break;
       case "ArrowUp":
         rotateShape();
+        break;
+      case "Space":
+        verticalDrop();
         break;
       default:
         break;
