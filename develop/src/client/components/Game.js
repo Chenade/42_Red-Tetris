@@ -19,6 +19,7 @@ const Game = ({ room, playerName }) => {
     const [ gameEnd,            setGameEnd            ] = useState(false);
     const [ opponentGameEnd,    setOpponentGameEnd    ] = useState(false);
     const [ nextBlock,          setNextBlock          ] = useState(null);
+    const [ blockUpdateCount,  setBlockUpdateCount  ] = useState(0);
 
     useEffect(() => {
     
@@ -49,10 +50,12 @@ const Game = ({ room, playerName }) => {
     const handleMessageEvent = (message) => {
         if (message.event === 'newPuzzle') {
             const init = message.data.type;
-            console.log('puzzle shape index :', init);
             if (0 <= init && init < 7) {
-                setInitialShape(shapes[shapeIndex[init]]);
+                if (blockUpdateCount === 0) {
+                    setInitialShape(shapes[shapeIndex[init]]);
+                }
                 setNextBlock(shapes[shapeIndex[init]]);
+                setBlockUpdateCount(count => count + 1);
             } else {
                 console.log('Received shape index is invalid:', init);
             }
@@ -132,6 +135,7 @@ const Game = ({ room, playerName }) => {
                                 indexRemoved={indexRemoved}
                                 initialShape={initialShape}
                                 nextBlock={nextBlock}
+                                blockUpdateCount={blockUpdateCount}
                             />
                         </div>
                         <div style={{ margin: '50px' }}>

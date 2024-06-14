@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { shapes } from "../configs/shapes";
 import { useInterval } from "../actions/useInterval";
 import { store } from '../index';
 import { sendMessage } from '../actions/alert';
@@ -17,7 +16,12 @@ let eventData = {
   }
 };
 
-export function useBoard(initialShape, nextBlock) {
+export function useBoard(
+  initialShape,
+  nextBlock,
+  blockUpdateCount
+) {
+
   // scene: background
   const [scene, setScene] = useState(
     Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0))
@@ -149,11 +153,16 @@ export function useBoard(initialShape, nextBlock) {
       setGameover(true);
       return;
     }
-    // drop new block
-    console.log('next block :', nextBlock);
+  }
+
+  function dropNewBlock() {
     setShape(nextBlock);
     setPosition({ x: 0, y: 0 });
   }
+
+  useEffect(() => {
+    dropNewBlock();
+  }, [blockUpdateCount]);
 
   function tick() {
     // when drop to the bottom
