@@ -177,6 +177,7 @@ const initEngine = io => {
 export function create(params) {
   const promise = new Promise((resolve, reject) => {
     const app = express();
+    app.use(cors());
     const server = initApp(app, params, () => {
       const io = socketIo(server);
 
