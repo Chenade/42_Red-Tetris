@@ -17,39 +17,39 @@ class TetrisServer {
 
   init() {
     this.app.use(cors());
-    this.app.get('/bundle.js', this.serveBundle);
-    this.app.get('/', this.serveIndex);
+    // this.app.get('/bundle.js', this.serveBundle);
+    // this.app.get('/', this.serveIndex);
 
     this.server.listen(this.params, () => {
-      log(`tetris listen on ${this.params.url}`);
+      // console.log(`tetris listen on ${this.params.url}`);
     });
 
     this.game.init();
   }
 
-  serveBundle(req, res) {
-    fs.readFile(__dirname + '/../../build/bundle.js', (err, data) => {
-      if (err) {
-        logerror(err);
-        res.writeHead(500);
-        return res.end('Error loading bundle.js');
-      }
-      res.writeHead(200);
-      res.end(data);
-    });
-  }
+  // serveBundle(req, res) {
+  //   fs.readFile(__dirname + '/../../build/bundle.js', (err, data) => {
+  //     if (err) {
+  //       logerror(err);
+  //       res.writeHead(500);
+  //       return res.end('Error loading bundle.js');
+  //     }
+  //     res.writeHead(200);
+  //     res.end(data);
+  //   });
+  // }
 
-  serveIndex(req, res) {
-    fs.readFile(__dirname + '/../../index.html', (err, data) => {
-      if (err) {
-        logerror(err);
-        res.writeHead(500);
-        return res.end('Error loading index.html');
-      }
-      res.writeHead(200);
-      res.end(data);
-    });
-  }
+  // serveIndex(req, res) {
+  //   fs.readFile(__dirname + '../client/public/index.html', (err, data) => {
+  //     if (err) {
+  //       logerror(err);
+  //       res.writeHead(500);
+  //       return res.end('Error loading index.html');
+  //     }
+  //     res.writeHead(200);
+  //     res.end(data);
+  //   });
+  // }
 
   stop(cb) {
     this.io.close();
