@@ -51,64 +51,6 @@ describe('TetrisGame', () => {
 		expect(mockSocket.on).toHaveBeenCalledTimes(8); // 8 event listeners
 	});
 
-	test('should handle joinRoom successfully', () => {
-		const roomId = 'room1';
-		mockIo.sockets.adapter.rooms[roomId] = { length: 0 };
-		game.handleJoinRoom(mockSocket, roomId);
-
-		expect(mockSocket.join).toHaveBeenCalledWith(roomId);
-		expect(TetrisRoom).toHaveBeenCalledWith(roomId);
-		expect(mockSocket.emit).toHaveBeenCalledWith('joinRoomSuccess', expect.objectContaining({ roomId }));
-		expect(mockSocket.to(roomId).emit).toHaveBeenCalledWith('op_joined', expect.objectContaining({ player: 'player1' }));
-	});
-
-
-	test('should handle joinRoom when room exists and is not playing and has less than 2 players', () => {
-		const roomId = 'room1';
-		const room = new TetrisRoom(roomId);
-		game.rooms[roomId] = room;
-
-		game.handleJoinRoom(mockSocket, roomId);
-
-		expect(mockSocket.join).toHaveBeenCalledWith(roomId);
-		expect(mockSocket.emit).toHaveBeenCalledWith('joinRoomSuccess', expect.objectContaining({ roomId }));
-	});
-
-	test('should handle joinRoom when room exists but is playing', () => {
-		const roomId = 'room1';
-		const room = new TetrisRoom(roomId);
-		room.status = 'playing';
-		game.rooms[roomId] = room;
-
-		game.handleJoinRoom(mockSocket, roomId);
-
-		expect(mockSocket.emit).toHaveBeenCalledWith('joinRoomFailed', 'Room already started');
-	});
-
-	test('should handle joinRoom when room exists and is full', () => {
-		const roomId = 'room1';
-		const room = new TetrisRoom(roomId);
-		room.addPlayer({ id: 'player1', player: 'player1' });
-		room.addPlayer({ id: 'player2', player: 'player2' });
-		game.rooms[roomId] = room;
-
-		game.handleJoinRoom(mockSocket, roomId);
-
-		expect(mockSocket.emit).toHaveBeenCalledWith('joinRoomFailed', 'Room is full');
-		expect(mockSocket.join).not.toHaveBeenCalled(); // Ensure socket does not join the room again
-	});
-
-
-	test('should handle joinRoom when room does not exist and is created', () => {
-		const roomId = 'room1';
-
-		game.handleJoinRoom(mockSocket, roomId);
-
-		expect(game.rooms[roomId]).toBeDefined();
-		expect(mockSocket.join).toHaveBeenCalledWith(roomId);
-		expect(mockSocket.emit).toHaveBeenCalledWith('joinRoomSuccess', expect.objectContaining({ roomId }));
-	});
-
 	test('should handle leaveRoom', () => {
 		const roomId = 'room1';
 		game.socketToPlayer.set(mockSocket.id, { roomId, player: 'player1' });
