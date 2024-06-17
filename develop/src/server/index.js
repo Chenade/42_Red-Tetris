@@ -121,12 +121,12 @@ const initEngine = io => {
         if (event === 'next') {
             // var player = data.player;
             if (player === 'player1') {
-                status[roomId].player1.puzzle += 1;
+                status[roomId].player1.puzzle = (status[roomId].player1.puzzle + 1) % 7;
                 io.to(socket.id).emit('message', { event: 'newPuzzle', data: { type: status[roomId].player1.puzzle } });
                 io.to(roomId).emit('message', { event: 'op_puzzle', data: {player: 'player1' , type: status[roomId].player1.puzzle } });
             }
             else if (player === 'player2') {
-				status[roomId].player2.puzzle += 1;
+				status[roomId].player2.puzzle = (status[roomId].player1.puzzle + 1) % 7;
                 io.to(socket.id).emit('message', { event: 'newPuzzle', data: { type: status[roomId].player2.puzzle } });
 				io.to(roomId).emit('message', { event: 'op_puzzle', data: {player: 'player2' , type: status[roomId].player2.puzzle } });
             }
@@ -177,6 +177,7 @@ const initEngine = io => {
 export function create(params) {
   const promise = new Promise((resolve, reject) => {
     const app = express();
+    app.use(cors());
     const server = initApp(app, params, () => {
       const io = socketIo(server);
 
