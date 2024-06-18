@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { shapes } from "../configs/shapes";
 import { useInterval } from "../actions/useInterval";
 
 const ROW_COUNT = 20;
 const COLUMN_COUNT = 10;
 const TICK_INTERVAL = 500;
 
-export function useOpponentBoard(initialShape) {
+export function useOpponentBoard(initialShape, opponentBlockUpdateCount, opponentNextBlock) {
   // scene: background
   const [scene, setScene] = useState(
     Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0))
@@ -131,10 +130,18 @@ export function useOpponentBoard(initialShape) {
       setGameover(true);
       return;
     }
-    // drop new block
-    setShape(shapes.J);
+  }
+
+  function dropNewBlock() {
+    setShape(opponentNextBlock);
     setPosition({ x: 0, y: 0 });
   }
+
+  useEffect(() => {
+    if (opponentBlockUpdateCount > 0) {
+      dropNewBlock();
+    }
+  }, [opponentBlockUpdateCount]);
 
   function tick() {
     // when drop to the bottom
@@ -221,6 +228,7 @@ export function useOpponentBoard(initialShape) {
   }
 
   function endGameWithWin() {
+    console.log('endGameWithWin');
     setGameover(true);
   }
 

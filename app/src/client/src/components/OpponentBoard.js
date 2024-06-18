@@ -8,9 +8,11 @@ const OpponentBoard = React.memo(({
   indexPenaltyAdded,
   initialShape,
   opponentAction,
+  opponentBlockUpdateCount,
+  opponentNextBlock
  }) => {
   
-  const [display, onKeyDown, addPenaltyRows, endGameWithWin] = useOpponentBoard(initialShape);
+  const [display, onKeyDown, addPenaltyRows, endGameWithWin] = useOpponentBoard(initialShape, opponentBlockUpdateCount, opponentNextBlock);
 
   useEffect(() => {
     if (opponentAction !== null) {
