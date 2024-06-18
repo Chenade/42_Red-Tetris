@@ -19,6 +19,7 @@ const Game = ({ room, playerName }) => {
     const [ errorMessage,       setErrorMessage       ] = useState('');
     const [ gameEnd,            setGameEnd            ] = useState(false);
     const [ opponentGameEnd,    setOpponentGameEnd    ] = useState(false);
+    const [ opponentExist,      setOpponentExist      ] = useState(false);
     const [ nextBlock,          setNextBlock          ] = useState(null);
     const [ blockUpdateCount,   setBlockUpdateCount    ] = useState(0);
     const [ opponentBlockUpdateCount, setOpponentBlockUpdateCount ] = useState(0);
@@ -26,7 +27,10 @@ const Game = ({ room, playerName }) => {
 
     useEffect(() => {
     
-        
+        if (playerName === 'player2') {
+            setOpponentExist(true);
+        }
+
         store.dispatch(startGameSuccess(store.getState().socket));
         store.dispatch(startGameFailed(store.getState().socket));
         store.dispatch(opponentJoin(store.getState().socket));
@@ -42,18 +46,21 @@ const Game = ({ room, playerName }) => {
                 }
             }
           }
+
           if (store.getState().op_join) {
             if (store.getState().op_join === true) {
                 setMessage(store.getState().joinedMember.player + ' joined the room');
+                setOpponentExist(true);
             }
           }
+
         });
     
         return () => {
           unsubscribe();
         };
     
-      }, []);
+    }, [playerName]);
 
     const handleStart = () => {
         store.dispatch(startGame(store.getState().socket));
@@ -156,19 +163,24 @@ const Game = ({ room, playerName }) => {
                                 blockUpdateCount={blockUpdateCount}
                             />
                         </div>
-                        <div style={{ margin: '50px' }}>
-                            <p>Opponent's Board</p>
-                            <OpponentBoard 
-                                addPenaltyRowCount={addPenaltyRowCount}
-                                gameEnd={opponentGameEnd}
-                                index={index}
-                                indexPenaltyAdded={indexPenaltyAdded}
-                                initialShape={initialShape} 
-                                opponentAction={opponentAction} 
-                                opponentNextBlock={opponentNextBlock}
-                                opponentBlockUpdateCount={opponentBlockUpdateCount}
-                            />
-                        </div>
+                        {
+                            opponentExist && 
+                            (
+                                <div style={{ margin: '50px' }}>
+                                    <p>Opponent's Board</p>
+                                <OpponentBoard 
+                                    addPenaltyRowCount={addPenaltyRowCount}
+                                    gameEnd={opponentGameEnd}
+                                    index={index}
+                                    indexPenaltyAdded={indexPenaltyAdded}
+                                    initialShape={initialShape} 
+                                    opponentAction={opponentAction} 
+                                    opponentNextBlock={opponentNextBlock}
+                                    opponentBlockUpdateCount={opponentBlockUpdateCount}
+                                    />
+                                </div>
+                            )
+                        }
                     </div>
                 ) : (
                     <button onClick={handleStart} style={{ margin: '10px' }}>
