@@ -3,7 +3,7 @@ import Board from './Board';
 import OpponentBoard from './OpponentBoard';
 import React, { useState, useEffect } from 'react';
 import { store } from '../index';
-import { startGame, receiveMessage, gameEndWithWin, startGameSuccess, startGameFailed } from '../actions/alert';
+import { startGame, receiveMessage, gameEndWithWin, startGameSuccess, startGameFailed, opponentJoin } from '../actions/alert';
 
 const Game = ({ room, playerName }) => {
 
@@ -16,6 +16,7 @@ const Game = ({ room, playerName }) => {
     const [ opponentAction,     setOpponentAction     ] = useState(null);
     const [ showBoard,          setShowBoard          ] = useState(false);
     const [ message,            setMessage            ] = useState('');
+    const [ errorMessage,       setErrorMessage       ] = useState('');
     const [ gameEnd,            setGameEnd            ] = useState(false);
     const [ opponentGameEnd,    setOpponentGameEnd    ] = useState(false);
     const [ nextBlock,          setNextBlock          ] = useState(null);
@@ -25,16 +26,25 @@ const Game = ({ room, playerName }) => {
 
     useEffect(() => {
     
+        
         store.dispatch(startGameSuccess(store.getState().socket));
         store.dispatch(startGameFailed(store.getState().socket));
+        store.dispatch(opponentJoin(store.getState().socket));
     
         const unsubscribe = store.subscribe(() => {
           if (store.getState().start) {
-            setMessage('');
-          } else {
-            if (store.getState().res) {
-                console.log('Failed to start game due to: ', store.getState().res);
-                setMessage('Failed to start game.');
+            if (store.getState().start === true) {
+                setErrorMessage('');
+            } else {
+                if (store.getState().res) {
+                    console.log('Failed to start game due to: ', store.getState().res);
+                    setErrorMessage('Failed to start game.');
+                }
+            }
+          }
+          if (store.getState().op_join) {
+            if (store.getState().op_join === true) {
+                setMessage(store.getState().joinedMember.player + ' joined the room');
             }
           }
         });
@@ -129,7 +139,8 @@ const Game = ({ room, playerName }) => {
             <h1>Red Tetris</h1>
             <p>Room: {room}</p>
             <p>Player: {playerName}</p>
-            <p style={{ color: 'red', fontWeight: 'bold' }}>{message}</p>
+            <p style={{ color: 'green', fontWeight: 'bold' }}>{message}</p>
+            <p style={{ color: 'red', fontWeight: 'bold' }}>{errorMessage}</p>
             {
                 showBoard ? 
                 (
