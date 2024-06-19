@@ -14,11 +14,11 @@ const Board = React.memo(({
     display,
     onKeyDown,
     addRows,
-    endGameWithWin
   ] = useBoard(
     initialShape,
     nextBlock,
-    blockUpdateCount
+    blockUpdateCount,
+    gameEnd
   );
 
   useEffect(() => {
@@ -37,12 +37,6 @@ const Board = React.memo(({
   useEffect(() => {
     addRows(addRowCount);
   }, [indexRemoved]);
-
-  useEffect(() => {
-    if (gameEnd === true) {
-      endGameWithWin();
-    }
-  } , [gameEnd]);
 
   return (
     <div>

@@ -19,7 +19,8 @@ let eventData = {
 export function useBoard(
   initialShape,
   nextBlock,
-  blockUpdateCount
+  blockUpdateCount,
+  gameEnd
 ) {
 
   // scene: background
@@ -36,6 +37,10 @@ export function useBoard(
   );
   // game over
   const [gameover, setGameover] = useState(false);
+
+  useEffect(() => {
+    setGameover(gameEnd);
+  }, [gameEnd]);
 
   function updateStage(stage, x, y) {
     const res = stage.slice();
@@ -270,9 +275,5 @@ export function useBoard(
     }
   }
 
-  function endGameWithWin() {
-    setGameover(true);
-  }
-
-  return [display, onKeyDown, addRows, endGame, endGameWithWin];
+  return [display, onKeyDown, addRows, endGame];
 }
