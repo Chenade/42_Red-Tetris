@@ -15,14 +15,25 @@ class TetrisRoom {
 
 	startGame() {
 		this.status = 'playing';
+		const puzzle = Math.floor(Math.random() * 6);
+		for (let player of this.players) {
+			player.setPuzzle(puzzle);
+		}
 	}
 
 	endGame() {
-		this.status = 'end';
+		this.status = 'waiting';
+		for (let player of this.players) {
+			player.setPuzzle(0);
+		}
 	}
 
 	getPlayers() {
 		return this.players;
+	}
+
+	getStatus() {
+		return this.status;
 	}
 }
 

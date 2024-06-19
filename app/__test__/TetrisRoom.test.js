@@ -1,45 +1,54 @@
-import TetrisRoom from './../src/server/TetrisRoom.js';
+import TetrisRoom from '../src/server/TetrisRoom.js';
 
 describe('TetrisRoom', () => {
 	let room;
+	let player1, player2;
 
 	beforeEach(() => {
 		room = new TetrisRoom('room1');
+		player1 = { setPuzzle: jest.fn() };
+		player2 = { setPuzzle: jest.fn() };
 	});
 
-	test('should initialize with correct roomId and default values', () => {
+	test('should initialize with given roomId', () => {
 		expect(room.roomId).toBe('room1');
 		expect(room.players).toEqual([]);
 		expect(room.status).toBe('waiting');
 	});
 
-	test('should add a player to the room', () => {
-		room.addPlayer('player1');
-		expect(room.players).toContain('player1');
+	test('should add a player', () => {
+		room.addPlayer(player1);
+		expect(room.getPlayers()).toContain(player1);
 	});
 
-	test('should remove a player from the room', () => {
-		room.addPlayer('player1');
-		room.addPlayer('player2');
-		room.removePlayer('player1');
-		expect(room.players).not.toContain('player1');
-		expect(room.players).toContain('player2');
+	test('should remove a player', () => {
+		room.addPlayer(player1);
+		room.addPlayer(player2);
+		room.removePlayer(player1);
+		expect(room.getPlayers()).not.toContain(player1);
+		expect(room.getPlayers()).toContain(player2);
 	});
 
-	test('should start the game', () => {
+	test('should start the game and set a puzzle for each player', () => {
+		room.addPlayer(player1);
+		room.addPlayer(player2);
 		room.startGame();
-		expect(room.status).toBe('playing');
+
+		expect(room.getStatus()).toBe('playing');
+		expect(player1.setPuzzle).toHaveBeenCalled();
+		expect(player2.setPuzzle).toHaveBeenCalled();
+		expect(player1.setPuzzle).toHaveBeenCalledWith(expect.any(Number));
+		expect(player2.setPuzzle).toHaveBeenCalledWith(expect.any(Number));
 	});
 
-	test('should end the game', () => {
-		room.startGame();  // Ensure the game is started before ending it
+	test('should end the game and reset the puzzle for each player', () => {
+		room.addPlayer(player1);
+		room.addPlayer(player2);
+		room.startGame();
 		room.endGame();
-		expect(room.status).toBe('end');
-	});
 
-	test('should return the list of players', () => {
-		room.addPlayer('player1');
-		room.addPlayer('player2');
-		expect(room.getPlayers()).toEqual(['player1', 'player2']);
+		expect(room.getStatus()).toBe('waiting');
+		expect(player1.setPuzzle).toHaveBeenCalledWith(0);
+		expect(player2.setPuzzle).toHaveBeenCalledWith(0);
 	});
 });
