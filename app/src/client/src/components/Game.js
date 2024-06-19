@@ -203,6 +203,13 @@ const Game = ({ room, playerName }) => {
                     </button>
                 )
             }
+            {
+                gameEnd ? (
+                    <button onClick={handleStart} style={{ margin: '10px' }}>
+                        Restart Game
+                    </button>
+                ) : null
+            }
         </div>
     );
 };

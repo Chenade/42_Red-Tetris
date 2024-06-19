@@ -15,6 +15,7 @@ export const GAME_END_WITH_WIN = 'GAME_END_WITH_WIN'
 export const SEND_MESSAGE = 'SEND_MESSAGE'
 export const OPPONENT_JOIN = 'OPPONENT_JOIN'
 export const OPPONENT_LEFT = 'OPPONENT_LEFT'
+export const SEND_END_GAME_MESSAGE = 'SEND_END_GAME_MESSAGE'
 
 export const alert = (message) => {
   return {
@@ -135,6 +136,14 @@ export const sendMessage = (socket, message) => {
   socket.emit('message', message);
   return {
     type: SEND_MESSAGE,
+    payload: { socket }
+  }
+}
+
+export const sendEndGameMessage = (socket) => {
+  socket.emit('end', 'player1'); // change playername
+  return {
+    type: SEND_END_GAME_MESSAGE,
     payload: { socket }
   }
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useInterval } from "../actions/useInterval";
 import { store } from '../index';
-import { sendMessage } from '../actions/alert';
+import { sendMessage, sendEndGameMessage } from '../actions/alert';
 
 
 const ROW_COUNT = 20;
@@ -153,6 +153,7 @@ export function useBoard(
 
     if (endGame()) {
       store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'action', info: { data: 'gameover' } })));
+      store.dispatch(sendEndGameMessage(store.getState().socket));
       setGameover(true);
       return;
     }
