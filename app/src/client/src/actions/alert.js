@@ -14,6 +14,7 @@ export const RECEIVE_MESSAGE = 'RECEIVE_MESSAGE'
 export const GAME_END_WITH_WIN = 'GAME_END_WITH_WIN'
 export const SEND_MESSAGE = 'SEND_MESSAGE'
 export const OPPONENT_JOIN = 'OPPONENT_JOIN'
+export const OPPONENT_LEFT = 'OPPONENT_LEFT'
 
 export const alert = (message) => {
   return {
@@ -148,6 +149,17 @@ export const opponentJoin = (socket) => {
           op_join: true, 
           joinedMember: data 
         }
+      });
+    });
+  }
+}
+
+export const opponentLeft = (socket) => {
+  return (dispatch) => {
+    socket.on('op_left', (data) => {
+      dispatch({
+        type: OPPONENT_LEFT,
+        payload: { socket, op_left: true }
       });
     });
   }

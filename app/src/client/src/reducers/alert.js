@@ -13,6 +13,7 @@ import {
   START_GAME_SUCCESS,
   START_GAME,
   OPPONENT_JOIN,
+  OPPONENT_LEFT
 } from '../actions/alert'
 
 const reducer = (state = {} , action) => {
@@ -45,7 +46,9 @@ const reducer = (state = {} , action) => {
       return { socket: action.payload.socket }
     case OPPONENT_JOIN:
       return { ...state, socket: action.payload.socket, op_join: action.payload.op_join, joinedMember: action.payload.joinedMember }
-    default: 
+    case OPPONENT_LEFT:
+      return { ...state, socket: action.payload.socket, op_left: action.payload.op_left }
+      default: 
       return state
   }
 }

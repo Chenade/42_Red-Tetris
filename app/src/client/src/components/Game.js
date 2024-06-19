@@ -3,7 +3,7 @@ import Board from './Board';
 import OpponentBoard from './OpponentBoard';
 import React, { useState, useEffect } from 'react';
 import { store } from '../index';
-import { startGame, receiveMessage, gameEndWithWin, startGameSuccess, startGameFailed, opponentJoin } from '../actions/alert';
+import { startGame, receiveMessage, gameEndWithWin, startGameSuccess, startGameFailed, opponentJoin, opponentLeft } from '../actions/alert';
 
 const Game = ({ room, playerName }) => {
 
@@ -24,6 +24,7 @@ const Game = ({ room, playerName }) => {
     const [ blockUpdateCount,   setBlockUpdateCount    ] = useState(0);
     const [ opponentBlockUpdateCount, setOpponentBlockUpdateCount ] = useState(0);
     const [ opponentNextBlock, setOpponentNextBlock ] = useState(null);
+    const [ isGameStarted,     setIsGameStarted ] = useState(false);
 
     useEffect(() => {
     
@@ -34,6 +35,7 @@ const Game = ({ room, playerName }) => {
         store.dispatch(startGameSuccess(store.getState().socket));
         store.dispatch(startGameFailed(store.getState().socket));
         store.dispatch(opponentJoin(store.getState().socket));
+        store.dispatch(opponentLeft(store.getState().socket));
     
         const unsubscribe = store.subscribe(() => {
           if (store.getState().start) {
@@ -54,16 +56,28 @@ const Game = ({ room, playerName }) => {
             }
           }
 
+          if (store.getState().op_left) {
+            if (store.getState().op_left === true) {
+                setMessage('Opponent left the room');
+                setOpponentExist(false);
+                if (isGameStarted) {
+                    setGameEnd(true);
+                    setOpponentGameEnd(true);
+                }
+            }
+          }
+
         });
     
         return () => {
           unsubscribe();
         };
     
-    }, [playerName]);
+    }, [playerName, isGameStarted]);
 
     const handleStart = () => {
         store.dispatch(startGame(store.getState().socket));
+        setIsGameStarted(true);
     };
 
     const handleMessageEvent = (message) => {
