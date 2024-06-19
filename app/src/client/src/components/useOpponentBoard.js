@@ -5,7 +5,12 @@ const ROW_COUNT = 20;
 const COLUMN_COUNT = 10;
 const TICK_INTERVAL = 500;
 
-export function useOpponentBoard(initialShape, opponentBlockUpdateCount, opponentNextBlock) {
+export function useOpponentBoard(
+  initialShape, 
+  opponentBlockUpdateCount, 
+  opponentNextBlock, 
+  gameEnd) {
+
   // scene: background
   const [scene, setScene] = useState(
     Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0))
@@ -20,6 +25,10 @@ export function useOpponentBoard(initialShape, opponentBlockUpdateCount, opponen
   );
   // game over
   const [gameover, setGameover] = useState(false);
+
+  useEffect(() => {
+    setGameover(gameEnd);
+  }, [gameEnd]);
 
   function updateStage(stage, x, y) {
     const res = stage.slice();

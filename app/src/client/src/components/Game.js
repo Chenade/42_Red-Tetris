@@ -102,6 +102,7 @@ const Game = ({ room, playerName }) => {
                     store.dispatch(gameEndWithWin(store.getState().socket));
                     setMessage(message.data.player + ' is Game Over. You Win!');
                     setGameEnd(true);
+                    setOpponentGameEnd(true);
                 } else if (action === 'gameEndWithWin') {
                     setOpponentGameEnd(true);
                 } else {

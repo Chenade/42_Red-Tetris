@@ -12,7 +12,16 @@ const OpponentBoard = React.memo(({
   opponentNextBlock
  }) => {
   
-  const [display, onKeyDown, addPenaltyRows, endGameWithWin] = useOpponentBoard(initialShape, opponentBlockUpdateCount, opponentNextBlock);
+  const [
+    display, 
+    onKeyDown, 
+    addPenaltyRows
+  ] = useOpponentBoard(
+    initialShape, 
+    opponentBlockUpdateCount, 
+    opponentNextBlock, 
+    gameEnd
+  );
 
   useEffect(() => {
     if (opponentAction !== null) {
@@ -23,12 +32,6 @@ const OpponentBoard = React.memo(({
   useEffect(() => {
     addPenaltyRows(addPenaltyRowCount);
   }, [indexPenaltyAdded]);
-
-  useEffect(() => {
-    if (gameEnd === true) {
-      endGameWithWin();
-    }
-  } , [gameEnd]);
 
   return (
     <div>
