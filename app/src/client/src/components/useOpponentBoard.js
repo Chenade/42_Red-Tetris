@@ -133,12 +133,14 @@ export function useOpponentBoard(
   }
 
   function touchGround() {
-    // keep the block in the scene
+
     setScene(mergeIntoStage(scene, shape, position));
+
     if (endGame()) {
       setGameover(true);
       return;
     }
+
   }
 
   function dropNewBlock() {

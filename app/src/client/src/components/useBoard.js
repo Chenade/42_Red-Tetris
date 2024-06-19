@@ -149,15 +149,16 @@ export function useBoard(
 
   function touchGround() {
 
-    store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'next' })));
-
-    // keep the block in the scene
     setScene(mergeIntoStage(scene, shape, position));
+
     if (endGame()) {
       store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'action', info: { data: 'gameover' } })));
       setGameover(true);
       return;
     }
+
+    store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'next' })));
+
   }
 
   function dropNewBlock() {
