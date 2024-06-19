@@ -113,7 +113,7 @@ const Game = ({ room, playerName }) => {
             } else {
                 const action = message.data.data.data;
                 if (action === 'gameover') {
-                    setMessage('Game Over!!!');
+                    setErrorMessage('Game Over!!!');
                     setGameEnd(true);
                 }
             }
