@@ -205,6 +205,7 @@ const Game = ({ room, playerName }) => {
                                     opponentAction={opponentAction} 
                                     opponentNextBlock={opponentNextBlock}
                                     opponentBlockUpdateCount={opponentBlockUpdateCount}
+                                    restartGame={restartGame}
                                     />
                                 </div>
                             )
