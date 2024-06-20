@@ -18,7 +18,6 @@ const Game = ({ room, playerName }) => {
     const [ message,            setMessage            ] = useState('');
     const [ errorMessage,       setErrorMessage       ] = useState('');
     const [ gameEnd,            setGameEnd            ] = useState(false);
-    const [ opponentGameEnd,    setOpponentGameEnd    ] = useState(false);
     const [ opponentExist,      setOpponentExist      ] = useState(false);
     const [ nextBlock,          setNextBlock          ] = useState(null);
     const [ blockUpdateCount,   setBlockUpdateCount    ] = useState(0);
@@ -42,7 +41,12 @@ const Game = ({ room, playerName }) => {
         const unsubscribe = store.subscribe(() => {
           if (store.getState().start) {
             if (store.getState().start === true) {
+                setMessage('');
                 setErrorMessage('');
+                setInitialShape([]);
+                setGameEnd(false);
+                setRestartGame(prevRestartGame => prevRestartGame + 1);
+                store.getState().start = false;
             } else {
                 if (store.getState().res) {
                     console.log('Failed to start game due to: ', store.getState().res);
@@ -64,7 +68,6 @@ const Game = ({ room, playerName }) => {
                 setOpponentExist(false);
                 if (isGameStarted) {
                     setGameEnd(true);
-                    setOpponentGameEnd(true);
                 }
             }
           }
@@ -79,7 +82,6 @@ const Game = ({ room, playerName }) => {
 
     const handleStart = () => {
         store.dispatch(startGame(store.getState().socket));
-        setRestartGame(prevRestartGame => prevRestartGame + 1);
     };
 
     const handleMessageEvent = (message) => {
@@ -119,9 +121,6 @@ const Game = ({ room, playerName }) => {
                     store.dispatch(gameEndWithWin(store.getState().socket));
                     setMessage(message.data.player + ' is Game Over. You Win!');
                     setGameEnd(true);
-                    setOpponentGameEnd(true);
-                } else if (action === 'gameEndWithWin') {
-                    setOpponentGameEnd(true);
                 } else {
                     setOpponentAction(action);
                     setIndex(prevIndex => {
@@ -198,7 +197,7 @@ const Game = ({ room, playerName }) => {
                                     <p>Opponent's Board</p>
                                 <OpponentBoard 
                                     addPenaltyRowCount={addPenaltyRowCount}
-                                    gameEnd={opponentGameEnd}
+                                    gameEnd={gameEnd}
                                     index={index}
                                     indexPenaltyAdded={indexPenaltyAdded}
                                     initialShape={initialShape} 
