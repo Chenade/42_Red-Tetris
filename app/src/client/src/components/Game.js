@@ -26,6 +26,7 @@ const Game = ({ room, playerName }) => {
     const [ opponentNextBlock, setOpponentNextBlock ] = useState(null);
     const [ isGameStarted,     setIsGameStarted ] = useState(false);
     const [ restartGame,       setRestartGame   ] = useState(0);
+    const [ showRestartButton, setShowRestartButton ] = useState(false);
 
     useEffect(() => {
     
@@ -78,7 +79,6 @@ const Game = ({ room, playerName }) => {
 
     const handleStart = () => {
         store.dispatch(startGame(store.getState().socket));
-        setIsGameStarted(true);
         setRestartGame(prevRestartGame => prevRestartGame + 1);
     };
 
@@ -88,6 +88,7 @@ const Game = ({ room, playerName }) => {
             if (0 <= init && init < 7) {
                 if (blockUpdateCount === 0) {
                     setInitialShape(shapes[shapeIndex[init]]);
+                    setIsGameStarted(true);
                 }
                 setNextBlock(shapes[shapeIndex[init]]);
                 setBlockUpdateCount(count => count + 1);
@@ -132,6 +133,7 @@ const Game = ({ room, playerName }) => {
                 if (action === 'gameover') {
                     setErrorMessage('Game Over!!!');
                     setGameEnd(true);
+                    setIsGameStarted(false);
                 }
             }
         }
@@ -157,6 +159,14 @@ const Game = ({ room, playerName }) => {
         if (initialShape && initialShape.length)
             setShowBoard(true);
     }, [initialShape]);
+
+    useEffect(() => {
+        if (gameEnd && !isGameStarted) {
+            setShowRestartButton(true);
+        } else {
+            setShowRestartButton(false);
+        }
+    }, [gameEnd, isGameStarted]);
 
     return (
         <div>
@@ -207,11 +217,11 @@ const Game = ({ room, playerName }) => {
                 )
             }
             {
-                gameEnd ? (
+                showRestartButton && (
                     <button onClick={handleStart} style={{ margin: '10px' }}>
                         Restart Game
                     </button>
-                ) : null
+                )
             }
         </div>
     );
