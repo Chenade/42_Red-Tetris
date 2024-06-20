@@ -25,6 +25,7 @@ const Game = ({ room, playerName }) => {
     const [ opponentBlockUpdateCount, setOpponentBlockUpdateCount ] = useState(0);
     const [ opponentNextBlock, setOpponentNextBlock ] = useState(null);
     const [ isGameStarted,     setIsGameStarted ] = useState(false);
+    const [ restartGame,       setRestartGame   ] = useState(0);
 
     useEffect(() => {
     
@@ -78,6 +79,7 @@ const Game = ({ room, playerName }) => {
     const handleStart = () => {
         store.dispatch(startGame(store.getState().socket));
         setIsGameStarted(true);
+        setRestartGame(prevRestartGame => prevRestartGame + 1);
     };
 
     const handleMessageEvent = (message) => {
@@ -176,6 +178,7 @@ const Game = ({ room, playerName }) => {
                                 initialShape={initialShape}
                                 nextBlock={nextBlock}
                                 blockUpdateCount={blockUpdateCount}
+                                restartGame={restartGame}
                             />
                         </div>
                         {
