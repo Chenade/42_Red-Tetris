@@ -27,6 +27,7 @@ export function useOpponentBoard(
   const [gameover, setGameover] = useState(false);
 
   useEffect(() => {
+    setShape(initialShape);
     setGameover(gameEnd);
   }, [gameEnd]);
 
@@ -69,7 +70,6 @@ export function useOpponentBoard(
     setShape(initialShape);
     setPosition({ x: 0, y: 0 });
     setDisplay(Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0)));
-    setGameover(false);
   }
 
   function updateDisplay() {

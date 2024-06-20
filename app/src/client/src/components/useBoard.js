@@ -81,7 +81,6 @@ export function useBoard(
     setShape(initialShape);
     setPosition({ x: 0, y: 0 });
     setDisplay(Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0)));
-    setGameover(false);
   }
 
   function updateDisplay() {

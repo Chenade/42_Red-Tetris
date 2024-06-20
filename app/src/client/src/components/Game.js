@@ -44,7 +44,6 @@ const Game = ({ room, playerName }) => {
                 setMessage('');
                 setErrorMessage('');
                 setInitialShape([]);
-                setGameEnd(false);
                 setRestartGame(prevRestartGame => prevRestartGame + 1);
                 store.getState().start = false;
             } else {
@@ -91,6 +90,7 @@ const Game = ({ room, playerName }) => {
                 if (blockUpdateCount === 0) {
                     setInitialShape(shapes[shapeIndex[init]]);
                     setIsGameStarted(true);
+                    setGameEnd(false);
                 }
                 setNextBlock(shapes[shapeIndex[init]]);
                 setBlockUpdateCount(count => count + 1);
