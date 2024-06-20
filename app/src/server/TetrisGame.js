@@ -1,3 +1,6 @@
+import TetrisRoom from './TetrisRoom.js';
+import TetrisPlayer from './TetrisPlayer.js';
+
 class TetrisGame {
     constructor(io) {
         this.io = io;
@@ -56,7 +59,7 @@ class TetrisGame {
 
     handleStart(socket) {
         const player = this.socketToPlayer.get(socket.id);
-        if (!player || player.role !== 'player1') {
+        if (!player || player.player !== 'player1') {
             this.io.to(player.getRoomId()).emit('error', 'Game cannot be started by you');
             return;
         }
@@ -117,12 +120,39 @@ class TetrisGame {
     }
 
     joinRoom(roomId, socket) {
-        // Implementation to join the room
-    }
+		socket.join(roomId);
+		const player = 'player' + (this.rooms[roomId].getPlayers().length + 1);
+		const tetrisPlayer = new TetrisPlayer(socket.id, roomId, player);
+		this.rooms[roomId].addPlayer(tetrisPlayer);
+		this.socketToPlayer.set(socket.id, tetrisPlayer);
+		socket.emit('joinRoomSuccess', { player, roomId });
+		socket.to(roomId).emit('op_joined', { player });
+	}
 
     leaveRoom(socket) {
-        // Implementation to leave the room
-    }
+		const player = this.socketToPlayer.get(socket.id);
+		if (!player) return;
+
+		const roomId = player.getRoomId();
+		socket.leave(roomId);
+		this.rooms[roomId].removePlayer(player.getPlayer());
+
+		socket.to(roomId).emit('op_left', {});
+
+		if (player.getPlayer() === 'player1') {
+			if (this.rooms[roomId].getPlayers() && this.rooms[roomId].getPlayers().length > 1) {
+				const otherPlayer = this.rooms[roomId].getPlayers()[0].id;
+				if (otherPlayer) {
+					const otherPlayerInstance = this.socketToPlayer.get(otherPlayer);
+					otherPlayerInstance.setPlayer('player1');
+					this.io.to(otherPlayer).emit('joinRoomSuccess', { player: 'player1', roomId });
+				}
+			} else {
+				this.rooms[roomId].removePlayer(player.getPlayer());
+				delete this.rooms[roomId];
+			}
+		}
+	}
 }
 
 export default TetrisGame;
