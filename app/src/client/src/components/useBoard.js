@@ -166,7 +166,9 @@ export function useBoard(
       return;
     }
 
-    store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'next' })));
+    setTimeout(() => {
+      store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'next' })));
+    }, 100);
 
   }
 
