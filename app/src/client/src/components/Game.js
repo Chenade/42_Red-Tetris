@@ -3,7 +3,16 @@ import Board from './Board';
 import OpponentBoard from './OpponentBoard';
 import React, { useState, useEffect } from 'react';
 import { store } from '../index';
-import { startGame, receiveMessage, gameEndWithWin, startGameSuccess, startGameFailed, opponentJoin, opponentLeft } from '../actions/alert';
+import { 
+    startGame,
+    receiveMessage,
+    gameEndWithWin,
+    startGameSuccess,
+    startGameFailed,
+    opponentJoin,
+    opponentLeft,
+    sendEndGameMessage
+} from '../actions/alert';
 
 const Game = ({ room, playerName }) => {
 
@@ -18,13 +27,14 @@ const Game = ({ room, playerName }) => {
     const [ message,            setMessage            ] = useState('');
     const [ errorMessage,       setErrorMessage       ] = useState('');
     const [ gameEnd,            setGameEnd            ] = useState(false);
-    const [ opponentGameEnd,    setOpponentGameEnd    ] = useState(false);
     const [ opponentExist,      setOpponentExist      ] = useState(false);
     const [ nextBlock,          setNextBlock          ] = useState(null);
     const [ blockUpdateCount,   setBlockUpdateCount    ] = useState(0);
     const [ opponentBlockUpdateCount, setOpponentBlockUpdateCount ] = useState(0);
     const [ opponentNextBlock, setOpponentNextBlock ] = useState(null);
     const [ isGameStarted,     setIsGameStarted ] = useState(false);
+    const [ restartGame,       setRestartGame   ] = useState(0);
+    const [ showRestartButton, setShowRestartButton ] = useState(false);
 
     useEffect(() => {
     
@@ -40,7 +50,11 @@ const Game = ({ room, playerName }) => {
         const unsubscribe = store.subscribe(() => {
           if (store.getState().start) {
             if (store.getState().start === true) {
+                setMessage('');
                 setErrorMessage('');
+                setInitialShape([]);
+                setRestartGame(prevRestartGame => prevRestartGame + 1);
+                store.getState().start = false;
             } else {
                 if (store.getState().res) {
                     console.log('Failed to start game due to: ', store.getState().res);
@@ -58,11 +72,12 @@ const Game = ({ room, playerName }) => {
 
           if (store.getState().op_left) {
             if (store.getState().op_left === true) {
+                store.dispatch(sendEndGameMessage(store.getState().socket));
                 setMessage('Opponent left the room');
                 setOpponentExist(false);
                 if (isGameStarted) {
                     setGameEnd(true);
-                    setOpponentGameEnd(true);
+                    setIsGameStarted(false);
                 }
             }
           }
@@ -77,7 +92,6 @@ const Game = ({ room, playerName }) => {
 
     const handleStart = () => {
         store.dispatch(startGame(store.getState().socket));
-        setIsGameStarted(true);
     };
 
     const handleMessageEvent = (message) => {
@@ -86,6 +100,8 @@ const Game = ({ room, playerName }) => {
             if (0 <= init && init < 7) {
                 if (blockUpdateCount === 0) {
                     setInitialShape(shapes[shapeIndex[init]]);
+                    setIsGameStarted(true);
+                    setGameEnd(false);
                 }
                 setNextBlock(shapes[shapeIndex[init]]);
                 setBlockUpdateCount(count => count + 1);
@@ -116,9 +132,7 @@ const Game = ({ room, playerName }) => {
                     store.dispatch(gameEndWithWin(store.getState().socket));
                     setMessage(message.data.player + ' is Game Over. You Win!');
                     setGameEnd(true);
-                    setOpponentGameEnd(true);
-                } else if (action === 'gameEndWithWin') {
-                    setOpponentGameEnd(true);
+                    setIsGameStarted(false);
                 } else {
                     setOpponentAction(action);
                     setIndex(prevIndex => {
@@ -130,6 +144,7 @@ const Game = ({ room, playerName }) => {
                 if (action === 'gameover') {
                     setErrorMessage('Game Over!!!');
                     setGameEnd(true);
+                    setIsGameStarted(false);
                 }
             }
         }
@@ -156,6 +171,14 @@ const Game = ({ room, playerName }) => {
             setShowBoard(true);
     }, [initialShape]);
 
+    useEffect(() => {
+        if (gameEnd && !isGameStarted) {
+            setShowRestartButton(true);
+        } else {
+            setShowRestartButton(false);
+        }
+    }, [gameEnd, isGameStarted]);
+
     return (
         <div>
             <h1>Red Tetris</h1>
@@ -176,6 +199,7 @@ const Game = ({ room, playerName }) => {
                                 initialShape={initialShape}
                                 nextBlock={nextBlock}
                                 blockUpdateCount={blockUpdateCount}
+                                restartGame={restartGame}
                             />
                         </div>
                         {
@@ -185,13 +209,14 @@ const Game = ({ room, playerName }) => {
                                     <p>Opponent's Board</p>
                                 <OpponentBoard 
                                     addPenaltyRowCount={addPenaltyRowCount}
-                                    gameEnd={opponentGameEnd}
+                                    gameEnd={gameEnd}
                                     index={index}
                                     indexPenaltyAdded={indexPenaltyAdded}
                                     initialShape={initialShape} 
                                     opponentAction={opponentAction} 
                                     opponentNextBlock={opponentNextBlock}
                                     opponentBlockUpdateCount={opponentBlockUpdateCount}
+                                    restartGame={restartGame}
                                     />
                                 </div>
                             )
@@ -204,11 +229,11 @@ const Game = ({ room, playerName }) => {
                 )
             }
             {
-                gameEnd ? (
+                showRestartButton && (
                     <button onClick={handleStart} style={{ margin: '10px' }}>
                         Restart Game
                     </button>
-                ) : null
+                )
             }
         </div>
     );

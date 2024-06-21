@@ -76,6 +76,13 @@ export function useBoard(
     return newStage;
   }
 
+  function clearState() {
+    setScene(Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0)));
+    setShape(initialShape);
+    setPosition({ x: 0, y: 0 });
+    setDisplay(Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0)));
+  }
+
   function updateDisplay() {
     setDisplay(mergeIntoStage(scene, shape, position));
   }
@@ -158,7 +165,9 @@ export function useBoard(
       return;
     }
 
-    store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'next' })));
+    setTimeout(() => {
+      store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'next' })));
+    }, 100);
 
   }
 
@@ -251,9 +260,9 @@ export function useBoard(
   }
 
   function addRows(addRowCount) {
-    if (addRowCount > 0) {
+    if (addRowCount > 1) {
       
-      addRowCount *= 2;
+      addRowCount -= 1;
 
       store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'action', info: { data: 'addPenaltyRows', value: addRowCount } })));
 
@@ -277,5 +286,5 @@ export function useBoard(
     }
   }
 
-  return [display, onKeyDown, addRows, endGame];
+  return [display, onKeyDown, addRows, clearState];
 }

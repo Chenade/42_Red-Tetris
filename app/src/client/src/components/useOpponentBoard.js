@@ -27,6 +27,7 @@ export function useOpponentBoard(
   const [gameover, setGameover] = useState(false);
 
   useEffect(() => {
+    setShape(initialShape);
     setGameover(gameEnd);
   }, [gameEnd]);
 
@@ -62,6 +63,13 @@ export function useOpponentBoard(
     }
 
     return newStage;
+  }
+
+  function clearState() {
+    setScene(Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0)));
+    setShape(initialShape);
+    setPosition({ x: 0, y: 0 });
+    setDisplay(Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0)));
   }
 
   function updateDisplay() {
@@ -238,10 +246,5 @@ export function useOpponentBoard(
 
   }
 
-  function endGameWithWin() {
-    console.log('endGameWithWin');
-    setGameover(true);
-  }
-
-  return [display, onKeyDown, addPenaltyRows, endGameWithWin];
+  return [display, onKeyDown, addPenaltyRows, clearState];
 }

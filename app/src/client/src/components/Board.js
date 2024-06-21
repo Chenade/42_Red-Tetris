@@ -7,13 +7,15 @@ const Board = React.memo(({
   indexRemoved, 
   initialShape, 
   nextBlock,
-  blockUpdateCount
+  blockUpdateCount,
+  restartGame
 }) => {
   
   const [
     display,
     onKeyDown,
     addRows,
+    clearState
   ] = useBoard(
     initialShape,
     nextBlock,
@@ -37,6 +39,10 @@ const Board = React.memo(({
   useEffect(() => {
     addRows(addRowCount);
   }, [indexRemoved]);
+
+  useEffect(() => {
+    clearState();
+  }, [restartGame]);
 
   return (
     <div>

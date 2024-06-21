@@ -153,6 +153,7 @@ class TetrisGame {
 			}
 		}
 	}
+
 }
 
 export default TetrisGame;
