@@ -260,9 +260,9 @@ export function useBoard(
   }
 
   function addRows(addRowCount) {
-    if (addRowCount > 0) {
+    if (addRowCount > 1) {
       
-      addRowCount *= 2;
+      addRowCount -= 1;
 
       store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'action', info: { data: 'addPenaltyRows', value: addRowCount } })));
 
