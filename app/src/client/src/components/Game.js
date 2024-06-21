@@ -3,7 +3,16 @@ import Board from './Board';
 import OpponentBoard from './OpponentBoard';
 import React, { useState, useEffect } from 'react';
 import { store } from '../index';
-import { startGame, receiveMessage, gameEndWithWin, startGameSuccess, startGameFailed, opponentJoin, opponentLeft } from '../actions/alert';
+import { 
+    startGame,
+    receiveMessage,
+    gameEndWithWin,
+    startGameSuccess,
+    startGameFailed,
+    opponentJoin,
+    opponentLeft,
+    sendEndGameMessage
+} from '../actions/alert';
 
 const Game = ({ room, playerName }) => {
 
@@ -63,10 +72,12 @@ const Game = ({ room, playerName }) => {
 
           if (store.getState().op_left) {
             if (store.getState().op_left === true) {
+                store.dispatch(sendEndGameMessage(store.getState().socket));
                 setMessage('Opponent left the room');
                 setOpponentExist(false);
                 if (isGameStarted) {
                     setGameEnd(true);
+                    setIsGameStarted(false);
                 }
             }
           }
