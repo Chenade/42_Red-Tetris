@@ -132,6 +132,7 @@ const Game = ({ room, playerName }) => {
                     store.dispatch(gameEndWithWin(store.getState().socket));
                     setMessage(message.data.player + ' is Game Over. You Win!');
                     setGameEnd(true);
+                    setIsGameStarted(false);
                 } else {
                     setOpponentAction(action);
                     setIndex(prevIndex => {
