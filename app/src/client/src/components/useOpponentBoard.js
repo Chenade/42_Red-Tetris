@@ -27,7 +27,9 @@ export function useOpponentBoard(
   const [gameover, setGameover] = useState(false);
 
   useEffect(() => {
-    setShape(initialShape);
+    if (!gameEnd){
+      setShape(initialShape);
+    }
     setGameover(gameEnd);
   }, [gameEnd]);
 
