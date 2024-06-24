@@ -10,7 +10,7 @@ class TetrisRoom {
 	}
 
 	removePlayer(player) {
-		this.players = this.players.filter(p => p !== player);
+		this.players = this.players.filter(p => p.player !== player);
 	}
 
 	startGame() {

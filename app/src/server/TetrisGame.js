@@ -69,18 +69,17 @@ class TetrisGame {
 
 		const roomId = player.getRoomId();
 		socket.leave(roomId);
-		this.rooms[roomId].removePlayer(player.getPlayer());
+		this.rooms[roomId]?.removePlayer(player.getPlayer());
+		this.rooms[roomId].endGame();
 
 		socket.to(roomId).emit('op_left', {});
 
 		if (player.getPlayer() === 'player1') {
-			if (this.rooms[roomId].getPlayers() && this.rooms[roomId].getPlayers().length > 1) {
-				const otherPlayer = this.rooms[roomId].getPlayers()[0].id;
-				if (otherPlayer) {
-					const otherPlayerInstance = this.socketToPlayer.get(otherPlayer);
-					otherPlayerInstance.setPlayer('player1');
-					this.io.to(otherPlayer).emit('joinRoomSuccess', { player: 'player1', roomId });
-				}
+			const room = this.rooms[roomId];
+			if (room.getPlayers() && room.getPlayers().length > 0) {
+				const otherPlayer = this.rooms[roomId].getPlayers()[0];
+				otherPlayer.setPlayer('player1');
+				this.io.to(otherPlayer).emit('lead_change', 'player1');
 			} else {
 				this.rooms[roomId].removePlayer(player.getPlayer());
 				delete this.rooms[roomId];
@@ -145,7 +144,7 @@ class TetrisGame {
                 } else {
                     if (player.getPlayer() === 'player1') {
                         this.io.to(roomId).emit('start', player.getPlayer());
-                        this.rooms[roomId].startGame(); // Assuming startGame() exists
+                        this.rooms[roomId].startGame();
 						this.io.to(roomId).emit('message', { event: 'newPuzzle', data: { type: player.getPuzzle() } } ) ;
                     } else {
                         this.io.to(roomId).emit('error', 'Game cannot be started by you');
@@ -165,7 +164,7 @@ class TetrisGame {
             const roomId = player.getRoomId();
 
             if (roomId && this.rooms[roomId]) {
-                this.rooms[roomId].endGame(socket, `${winner} wins`); // Assuming endGame() exists
+                this.rooms[roomId].endGame(socket, `${winner} wins`);
             } else {
                 console.error(`Room with ID ${roomId} does not exist.`);
             }
@@ -181,7 +180,7 @@ class TetrisGame {
 
             if (roomId && this.rooms[roomId]) {
                 if (player.getPlayer() === 'player1') {
-                    this.rooms[roomId].endGame(socket, 'Game stopped by player1'); // Assuming endGame() exists
+                    this.rooms[roomId].endGame(socket, 'Game stopped by player1');
                 } else {
                     this.io.to(roomId).emit('error', 'Game cannot be stopped by you');
                 }
