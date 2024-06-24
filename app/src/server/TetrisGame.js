@@ -78,7 +78,9 @@ class TetrisGame {
 			const room = this.rooms[roomId];
 			if (room.getPlayers() && room.getPlayers().length > 0) {
 				const otherPlayer = this.rooms[roomId].getPlayers()[0];
-				otherPlayer.setPlayer('player1');
+				otherPlayer.setPlayer("player1");
+				// const player = "player1";
+				// this.io.to(otherPlayer).emit('joinRoomSuccess', { player, roomId });
 				this.io.to(otherPlayer).emit('lead_change', 'player1');
 			} else {
 				this.rooms[roomId].removePlayer(player.getPlayer());
