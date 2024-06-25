@@ -14,7 +14,7 @@ import {
     sendEndGameMessage
 } from '../actions/alert';
 
-const Game = ({ room, playerName }) => {
+const Game = ({ room, playerName, setPlayerName }) => {
 
     const [ addRowCount,        setAddRowCount        ] = useState(0);
     const [ addPenaltyRowCount, setAddPenaltyRowCount ] = useState(0);
@@ -82,6 +82,10 @@ const Game = ({ room, playerName }) => {
             if (store.getState().op_left === true) {
                 store.dispatch(sendEndGameMessage(store.getState().socket));
                 setMessage('Opponent left the room');
+                console.log('playerName:', playerName);
+                if (playerName === 'player2') {
+                    setPlayerName('player1');
+                }
                 if (isGameStarted) {
                     setGameEnd(true);
                     setIsGameStarted(false);
@@ -95,7 +99,7 @@ const Game = ({ room, playerName }) => {
           unsubscribe();
         };
     
-    }, [playerName, isGameStarted]);
+    }, [playerName, isGameStarted, setPlayerName]);
 
     const handleStart = () => {
         store.dispatch(startGame(store.getState().socket));
