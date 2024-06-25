@@ -37,10 +37,6 @@ const Game = ({ room, playerName }) => {
     const [ showRestartButton, setShowRestartButton ] = useState(false);
 
     useEffect(() => {
-    
-        if (playerName === 'player2') {
-            setOpponentExist(true);
-        }
 
         store.dispatch(startGameSuccess(store.getState().socket));
         store.dispatch(startGameFailed(store.getState().socket));
@@ -54,6 +50,14 @@ const Game = ({ room, playerName }) => {
                 setErrorMessage('');
                 setInitialShape([]);
                 setRestartGame(prevRestartGame => prevRestartGame + 1);
+                const playerCount = store.getState().res;
+                if (playerCount === 1) {
+                    setOpponentExist(false);
+                } else if (playerCount === 2) {
+                    setOpponentExist(true);
+                } else {
+                    console.log('player count is invalid:', playerCount);
+                }
                 store.getState().start = false;
             } else {
                 if (store.getState().res) {
@@ -71,7 +75,6 @@ const Game = ({ room, playerName }) => {
           if (store.getState().op_join) {
             if (store.getState().op_join === true) {
                 setMessage(store.getState().joinedMember.player + ' joined the room');
-                setOpponentExist(true);
             }
           }
 
@@ -79,7 +82,6 @@ const Game = ({ room, playerName }) => {
             if (store.getState().op_left === true) {
                 store.dispatch(sendEndGameMessage(store.getState().socket));
                 setMessage('Opponent left the room');
-                setOpponentExist(false);
                 if (isGameStarted) {
                     setGameEnd(true);
                     setIsGameStarted(false);

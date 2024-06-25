@@ -145,7 +145,7 @@ class TetrisGame {
                     this.io.to(roomId).emit('error', 'Game already started');
                 } else {
                     if (player.getPlayer() === 'player1') {
-                        this.io.to(roomId).emit('start', player.getPlayer());
+                        this.io.to(roomId).emit('start', this.rooms[roomId].getPlayers().length);
                         this.rooms[roomId].startGame();
 						this.io.to(roomId).emit('message', { event: 'newPuzzle', data: { type: player.getPuzzle() } } ) ;
                     } else {
