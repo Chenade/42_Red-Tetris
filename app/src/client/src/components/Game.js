@@ -82,7 +82,6 @@ const Game = ({ room, playerName, setPlayerName }) => {
             if (store.getState().op_left === true) {
                 store.dispatch(sendEndGameMessage(store.getState().socket));
                 setMessage('Opponent left the room');
-                console.log('playerName:', playerName);
                 if (playerName === 'player2') {
                     setPlayerName('player1');
                 }
@@ -175,7 +174,7 @@ const Game = ({ room, playerName, setPlayerName }) => {
           unsubscribe();
         };
     
-      }, []);
+      }, [playerName]);
 
     useEffect(() => {
         if (initialShape && initialShape.length)
