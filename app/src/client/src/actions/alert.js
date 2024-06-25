@@ -76,7 +76,7 @@ export const joinRoomFailed = (socket) => {
     socket.on('joinRoomFailed', (data) => {
       dispatch({
         type: JOIN_ROOM_FAILED,
-        payload: { socket, join: false, res: data }
+        payload: { socket, join: false, res: data, joinRoomFailed: true }
       });
     });
   }

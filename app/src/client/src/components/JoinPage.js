@@ -21,6 +21,10 @@ const JoinPage = ({ onJoinSuccess }) => {
             }
           }
         }
+        if (store.getState().joinRoomFailed) {
+          setError(store.getState().res);
+          store.getState().joinRoomFailed = false;
+        }
       });
   
       return () => {
@@ -43,7 +47,7 @@ const JoinPage = ({ onJoinSuccess }) => {
                 onChange={(e) => setRoom(e.target.value)}
             />
             <button onClick={handleJoin}>Join</button>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {error && <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>}
         </div>
     );
 };

@@ -32,7 +32,7 @@ const reducer = (state = {} , action) => {
     case JOIN_ROOM_SUCCESS:
       return { ...state, join: action.payload.join, res: action.payload.res }
     case JOIN_ROOM_FAILED:
-      return { ...state, join: action.payload.join, res: action.payload.res }
+      return { ...state, join: action.payload.join, res: action.payload.res, joinRoomFailed: action.payload.joinRoomFailed }
     case START_GAME:
       return { ...state, socket: action.payload.socket }
     case START_GAME_SUCCESS:
