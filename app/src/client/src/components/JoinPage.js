@@ -34,6 +34,10 @@ const JoinPage = ({ onJoinSuccess }) => {
     });
 
     const handleJoin = () => {
+        if (room === '') {
+            setError('Room is empty');
+            return;
+        }
         store.dispatch(joinRoom(store.getState().socket, room));
     };
 
