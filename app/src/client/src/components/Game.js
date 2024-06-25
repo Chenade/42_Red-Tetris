@@ -63,6 +63,11 @@ const Game = ({ room, playerName }) => {
             }
           }
 
+          if (store.getState().startGameFailed) {
+            setErrorMessage(store.getState().res);
+            store.getState().startGameFailed = false;
+          }
+
           if (store.getState().op_join) {
             if (store.getState().op_join === true) {
                 setMessage(store.getState().joinedMember.player + ' joined the room');

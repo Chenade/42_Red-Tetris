@@ -149,7 +149,7 @@ class TetrisGame {
                         this.rooms[roomId].startGame();
 						this.io.to(roomId).emit('message', { event: 'newPuzzle', data: { type: player.getPuzzle() } } ) ;
                     } else {
-                        this.io.to(roomId).emit('error', 'Game cannot be started by you');
+                        this.io.to(socket.id).emit('error', 'Game cannot be started by you');
                     }
                 }
             } else {

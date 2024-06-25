@@ -106,7 +106,7 @@ export const startGameFailed = (socket) => {
     socket.on('error', (data) => {
       dispatch({
         type: START_GAME_FAILED,
-        payload: { socket, start: false, res: data }
+        payload: { socket, start: false, res: data, startGameFailed: true }
       });
     });
   }

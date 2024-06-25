@@ -38,7 +38,7 @@ const reducer = (state = {} , action) => {
     case START_GAME_SUCCESS:
       return { ...state, socket: action.payload.socket, res: action.payload.res, start: action.payload.start }
     case START_GAME_FAILED:
-      return { ...state, socket: action.payload.socket, res: action.payload.res, start: action.payload.start }
+      return { ...state, socket: action.payload.socket, res: action.payload.res, start: action.payload.start, startGameFailed: action.payload.startGameFailed }
     case RECEIVE_MESSAGE:
       return { ...state, socket: action.payload.socket, message: action.payload.message }
     case GAME_END_WITH_WIN:
