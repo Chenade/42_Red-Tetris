@@ -108,11 +108,9 @@ const Game = ({ room, playerName, setPlayerName }) => {
         if (message.event === 'newPuzzle') {
             const init = message.data.type;
             if (0 <= init && init < 7) {
-                if (blockUpdateCount === 0) {
-                    setInitialShape(shapes[shapeIndex[init]]);
-                    setIsGameStarted(true);
-                    setGameEnd(false);
-                }
+                setInitialShape(shapes[shapeIndex[init]]);
+                setIsGameStarted(true);
+                setGameEnd(false);
                 setNextBlock(shapes[shapeIndex[init]]);
                 setBlockUpdateCount(count => count + 1);
             } else {
