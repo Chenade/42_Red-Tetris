@@ -8,26 +8,36 @@ const JoinPage = ({ onJoinSuccess }) => {
 
     useEffect(() => {
     
-        store.dispatch(joinRoomSuccess(store.getState().socket));
-        store.dispatch(joinRoomFailed(store.getState().socket));
-    
-        const unsubscribe = store.subscribe(() => {
-          if (store.getState().join) {
+      store.dispatch(joinRoomSuccess(store.getState().socket));
+      store.dispatch(joinRoomFailed(store.getState().socket));
+  
+      const unsubscribe = store.subscribe(() => {
+        if (store.getState().join) {
+          if (store.getState().join === true) {
             onJoinSuccess(store.getState().res.roomId, store.getState().res.player);
           } else {
             if (store.getState().res) {
               setError(store.getState().res);
             }
           }
-        });
-    
-        return () => {
-          unsubscribe();
-        };
-    
-      }, []);
+        }
+        if (store.getState().joinRoomFailed) {
+          setError(store.getState().res);
+          store.getState().joinRoomFailed = false;
+        }
+      });
+  
+      return () => {
+        unsubscribe();
+      };
+  
+    });
 
     const handleJoin = () => {
+        if (room === '') {
+            setError('Room is empty');
+            return;
+        }
         store.dispatch(joinRoom(store.getState().socket, room));
     };
 
@@ -41,7 +51,7 @@ const JoinPage = ({ onJoinSuccess }) => {
                 onChange={(e) => setRoom(e.target.value)}
             />
             <button onClick={handleJoin}>Join</button>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {error && <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>}
         </div>
     );
 };

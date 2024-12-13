@@ -5,20 +5,22 @@ import JoinPage from '../components/JoinPage';
 
 const App = () => {
 
-  const [playerInfo, setPlayerInfo] = useState(null);
+  const [roomName, setRoomName] = useState(null);
+  const [playerName, setPlayerName] = useState(null);
 
   const handleJoinSuccess = (room, playerName) => {
       const gameUrl = `/${room}/${playerName}`;
       window.history.pushState({ room, playerName }, '', gameUrl);
-      setPlayerInfo({ room, playerName });
+      setRoomName(room);
+      setPlayerName(playerName);
   };
 
   return (
       <div>
-          {!playerInfo ? (
+          {!roomName || !playerName ? (
               <JoinPage onJoinSuccess={handleJoinSuccess} />
           ) : (
-              <Game room={playerInfo.room} playerName={playerInfo.playerName} />
+              <Game room={roomName} playerName={playerName} setPlayerName={setPlayerName} />
           )}
       </div>
   );

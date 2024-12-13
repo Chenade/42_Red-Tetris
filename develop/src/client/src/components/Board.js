@@ -7,18 +7,20 @@ const Board = React.memo(({
   indexRemoved, 
   initialShape, 
   nextBlock,
-  blockUpdateCount
+  blockUpdateCount,
+  restartGame
 }) => {
   
   const [
     display,
     onKeyDown,
     addRows,
-    endGameWithWin
+    clearState
   ] = useBoard(
     initialShape,
     nextBlock,
-    blockUpdateCount
+    blockUpdateCount,
+    gameEnd
   );
 
   useEffect(() => {
@@ -39,10 +41,8 @@ const Board = React.memo(({
   }, [indexRemoved]);
 
   useEffect(() => {
-    if (gameEnd === true) {
-      endGameWithWin();
-    }
-  } , [gameEnd]);
+    clearState();
+  }, [restartGame]);
 
   return (
     <div>

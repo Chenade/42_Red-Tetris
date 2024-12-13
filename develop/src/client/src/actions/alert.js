@@ -1,4 +1,5 @@
 import io from 'socket.io-client';
+
 export const ALERT_POP = 'ALERT_POP'
 export const SET_SOCKET = 'SET_SOCKET'
 export const CONNECT_SOCKET = 'CONNECT_SOCKET'
@@ -12,6 +13,9 @@ export const START_GAME_FAILED = 'START_GAME_FAILED'
 export const RECEIVE_MESSAGE = 'RECEIVE_MESSAGE'
 export const GAME_END_WITH_WIN = 'GAME_END_WITH_WIN'
 export const SEND_MESSAGE = 'SEND_MESSAGE'
+export const OPPONENT_JOIN = 'OPPONENT_JOIN'
+export const OPPONENT_LEFT = 'OPPONENT_LEFT'
+export const SEND_END_GAME_MESSAGE = 'SEND_END_GAME_MESSAGE'
 
 export const alert = (message) => {
   return {
@@ -72,7 +76,7 @@ export const joinRoomFailed = (socket) => {
     socket.on('joinRoomFailed', (data) => {
       dispatch({
         type: JOIN_ROOM_FAILED,
-        payload: { socket, join: false, res: data }
+        payload: { socket, join: false, res: data, joinRoomFailed: true }
       });
     });
   }
@@ -102,7 +106,7 @@ export const startGameFailed = (socket) => {
     socket.on('error', (data) => {
       dispatch({
         type: START_GAME_FAILED,
-        payload: { socket, start: false, res: data }
+        payload: { socket, start: false, res: data, startGameFailed: true }
       });
     });
   }
@@ -136,3 +140,36 @@ export const sendMessage = (socket, message) => {
   }
 }
 
+export const sendEndGameMessage = (socket) => {
+  socket.emit('end', 'player1'); // change playername
+  return {
+    type: SEND_END_GAME_MESSAGE,
+    payload: { socket }
+  }
+}
+
+export const opponentJoin = (socket) => {
+  return (dispatch) => {
+    socket.on('op_joined', (data) => {
+      dispatch({
+        type: OPPONENT_JOIN,
+        payload: { 
+          socket, 
+          op_join: true, 
+          joinedMember: data 
+        }
+      });
+    });
+  }
+}
+
+export const opponentLeft = (socket) => {
+  return (dispatch) => {
+    socket.on('op_left', (data) => {
+      dispatch({
+        type: OPPONENT_LEFT,
+        payload: { socket, op_left: true }
+      });
+    });
+  }
+}

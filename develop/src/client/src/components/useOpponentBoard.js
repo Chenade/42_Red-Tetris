@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
-import { shapes } from "../configs/shapes";
 import { useInterval } from "../actions/useInterval";
 
 const ROW_COUNT = 20;
 const COLUMN_COUNT = 10;
 const TICK_INTERVAL = 500;
 
-export function useOpponentBoard(initialShape) {
+export function useOpponentBoard(
+  initialShape, 
+  opponentBlockUpdateCount, 
+  opponentNextBlock, 
+  gameEnd) {
+
   // scene: background
   const [scene, setScene] = useState(
     Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0))
@@ -21,6 +25,13 @@ export function useOpponentBoard(initialShape) {
   );
   // game over
   const [gameover, setGameover] = useState(false);
+
+  useEffect(() => {
+    if (!gameEnd){
+      setShape(initialShape);
+    }
+    setGameover(gameEnd);
+  }, [gameEnd]);
 
   function updateStage(stage, x, y) {
     const res = stage.slice();
@@ -54,6 +65,13 @@ export function useOpponentBoard(initialShape) {
     }
 
     return newStage;
+  }
+
+  function clearState() {
+    setScene(Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0)));
+    setShape(initialShape);
+    setPosition({ x: 0, y: 0 });
+    setDisplay(Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0)));
   }
 
   function updateDisplay() {
@@ -125,16 +143,26 @@ export function useOpponentBoard(initialShape) {
   }
 
   function touchGround() {
-    // keep the block in the scene
+
     setScene(mergeIntoStage(scene, shape, position));
+
     if (endGame()) {
       setGameover(true);
       return;
     }
-    // drop new block
-    setShape(shapes.J);
+
+  }
+
+  function dropNewBlock() {
+    setShape(opponentNextBlock);
     setPosition({ x: 0, y: 0 });
   }
+
+  useEffect(() => {
+    if (opponentBlockUpdateCount > 0) {
+      dropNewBlock();
+    }
+  }, [opponentBlockUpdateCount]);
 
   function tick() {
     // when drop to the bottom
@@ -220,9 +248,5 @@ export function useOpponentBoard(initialShape) {
 
   }
 
-  function endGameWithWin() {
-    setGameover(true);
-  }
-
-  return [display, onKeyDown, addPenaltyRows, endGameWithWin];
+  return [display, onKeyDown, addPenaltyRows, clearState];
 }

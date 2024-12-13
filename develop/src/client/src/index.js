@@ -1,10 +1,10 @@
 import React from 'react'
-import ReactDom from 'react-dom'
+import ReactDOM from 'react-dom/client';
 import { createLogger } from 'redux-logger'
-import thunk from 'redux-thunk'
+import {  thunk } from 'redux-thunk'
 import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
-import { storeStateMiddleWare } from './middleware/storeStateMiddleWare'
+// import { storeStateMiddleWare } from './middleware/storeStateMiddleWare'
 import reducer from './reducers'
 import App from './containers/app'
 import { setSocket } from './actions/alert';
@@ -23,9 +23,10 @@ store.dispatch(setSocket());
 store.dispatch({ type: 'CONNECT_SOCKET', payload: store.getState().socket });
 store.dispatch({ type: 'DISCONNECT_SOCKET', payload: store.getState().socket });
 
-ReactDom.render((
-  <Provider store={store}>
-    <App />
-  </Provider>
-), document.getElementById('tetris'))
-
+document.addEventListener('DOMContentLoaded', function() {
+  ReactDOM.createRoot(document.getElementById('tetris')).render(
+    <Provider store={store}>
+      <App />
+    </Provider>
+  );
+});

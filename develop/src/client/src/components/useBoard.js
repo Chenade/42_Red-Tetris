@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useInterval } from "../actions/useInterval";
 import { store } from '../index';
-import { sendMessage } from '../actions/alert';
+import { sendMessage, sendEndGameMessage } from '../actions/alert';
 
 
 const ROW_COUNT = 20;
@@ -19,7 +19,8 @@ let eventData = {
 export function useBoard(
   initialShape,
   nextBlock,
-  blockUpdateCount
+  blockUpdateCount,
+  gameEnd
 ) {
 
   // scene: background
@@ -36,6 +37,10 @@ export function useBoard(
   );
   // game over
   const [gameover, setGameover] = useState(false);
+
+  useEffect(() => {
+    setGameover(gameEnd);
+  }, [gameEnd]);
 
   function updateStage(stage, x, y) {
     const res = stage.slice();
@@ -69,6 +74,13 @@ export function useBoard(
     }
 
     return newStage;
+  }
+
+  function clearState() {
+    setScene(Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0)));
+    setShape(initialShape);
+    setPosition({ x: 0, y: 0 });
+    setDisplay(Array.from({ length: ROW_COUNT }, () => Array(COLUMN_COUNT).fill(0)));
   }
 
   function updateDisplay() {
@@ -144,15 +156,19 @@ export function useBoard(
 
   function touchGround() {
 
-    store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'next' })));
-
-    // keep the block in the scene
     setScene(mergeIntoStage(scene, shape, position));
+
     if (endGame()) {
       store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'action', info: { data: 'gameover' } })));
+      store.dispatch(sendEndGameMessage(store.getState().socket));
       setGameover(true);
       return;
     }
+
+    setTimeout(() => {
+      store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'next' })));
+    }, 100);
+
   }
 
   function dropNewBlock() {
@@ -244,9 +260,9 @@ export function useBoard(
   }
 
   function addRows(addRowCount) {
-    if (addRowCount > 0) {
+    if (addRowCount > 1) {
       
-      addRowCount *= 2;
+      addRowCount -= 1;
 
       store.dispatch(sendMessage(store.getState().socket, JSON.stringify({ event: 'action', info: { data: 'addPenaltyRows', value: addRowCount } })));
 
@@ -270,9 +286,5 @@ export function useBoard(
     }
   }
 
-  function endGameWithWin() {
-    setGameover(true);
-  }
-
-  return [display, onKeyDown, addRows, endGame, endGameWithWin];
+  return [display, onKeyDown, addRows, clearState];
 }
